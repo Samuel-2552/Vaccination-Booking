@@ -30,8 +30,12 @@ A Web Application for covid vaccination booking using Flask framework.
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/8effa997-4e46-4d01-ac41-a65870bba0a6)
 2. Sign-Up.html
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/0660ba8f-2aed-4c80-bc79-65ddbf6dcd3e)
-3. Sign-In.html
+3. Sign-In.html / Admin-Login.html
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/50ba86d2-26ea-4cb6-8665-0df38289648b)
+4. Book-Slots.html
+   ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/da18136d-b7f0-45cd-82f1-92a3e7948e63)
+5. Admin-Dashboard.html
+   
    
 ## Flask App Setup
 1. Create a new file called `app.py` in your Replit project.
