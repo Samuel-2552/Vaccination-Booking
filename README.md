@@ -20,9 +20,9 @@ A Web Application for covid vaccination booking using Flask framework.
 2. Import the required packages (`sqlite3`).
 3. Create a connection to the SQLite database and a cursor object.
 4. Write SQL queries to create the necessary tables for the application.
-   - User table: id, username, password
-   - VaccinationCenter table: id, name, working_hours
-   - Slot table: id, center_id, date, capacity, available_slots
+   - User table: id, username, email-id, password
+   - VaccinationCenter table: id, name, working_hours, gps_location
+   - Slot table: id, center_id, date, capacity, available_slots, user_names.
 5. Commit the changes and push them to your GitHub repository for backup.
 
 ## Flask App Setup
