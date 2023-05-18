@@ -25,6 +25,11 @@ A Web Application for covid vaccination booking using Flask framework.
    - Slot table: id, center_id, date, capacity, available_slots, user_names.
 5. Commit the changes and push them to your GitHub repository for backup.
 
+## Rough Wireframe for Each Page
+1. Home.html
+   ![Home](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/128f2ce2-4f40-40ce-b276-6ef9e21da247)
+
+
 ## Flask App Setup
 1. Create a new file called `app.py` in your Replit project.
 2. Import the required packages (`flask`, `sqlite3`).
