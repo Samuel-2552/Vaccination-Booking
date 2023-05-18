@@ -65,9 +65,7 @@ A Web Application for covid vaccination booking using Flask framework.
    - Retrieve the selected vaccination center and date from the request.
    - Check if the slot capacity for the selected date is available and update the Slot table accordingly.
    - Display a success message or an error message to the user.
-5. Implement the logout functionality
-
-.
+5. Implement the logout functionality.
    - Define a function in `app.py` to handle the logout route.
    - Clear the user's session data and redirect them to the login page.
 
@@ -103,4 +101,4 @@ A Web Application for covid vaccination booking using Flask framework.
 3. Set up automatic deployment from your GitHub repository to Replit.
 4. Monitor the deployed application for any errors or issues and make necessary adjustments if required.
 
-Note: The above steps provide a high-level overview of the tasks required to implement the COVID Vaccination Booking Web Application using Flask and SQLite in Replit and backed up in GitHub. It is recommended to refer to Flask and SQLite documentation for more detailed information on how to implement each step.
+Note: The above steps may change with respect to the changes in the websites to implement the COVID Vaccination Booking Web Application. It is recommended to refer to Flask, SQLite and Replit documentation for more detailed information on how to implement each step.
