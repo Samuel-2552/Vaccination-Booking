@@ -1,6 +1,23 @@
 # Vaccination-Booking
 A Web Application for covid vaccination booking using Flask framework.
 
+# Assigned Coding Task (Problem Statement #2. Covid Vaccination Booking) - Backend Development (Optional Full-Stack Development)
+Create a web application for covid vaccination booking. Use any tech stack for the backendand db. A console based application would work. Submissions with a very basic UI will begiven extra marks
+*Type of Users*
+a. User
+b. Admin
+*User Use Cases*
+● Login
+● Sign up
+● Searching for Vaccination centre and working hours
+● Apply for a vaccination slot (only 10 candidates allowed per day)
+● Logout
+*Admin Use Cases*
+● Login (Seperate login for Admin)
+● Add Vaccination Centres
+● Get dosage details (group by centres)
+● Remove vaccination centres
+
 # TODO List for COVID Vaccination Booking Web Application
 
 ## Backend Setup
