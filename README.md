@@ -27,7 +27,10 @@ A Web Application for covid vaccination booking using Flask framework.
 
 ## Rough Wireframe for Each Page
 1. Home.html
-   ![Home](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/128f2ce2-4f40-40ce-b276-6ef9e21da247)
+   ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/8effa997-4e46-4d01-ac41-a65870bba0a6)
+2. Sign-Up.html
+   ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/82052bf8-a729-4318-933a-ef80fc7f3190)
+
 
 
 ## Flask App Setup
