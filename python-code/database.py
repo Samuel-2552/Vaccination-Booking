@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS VaccinationCenter (
 id INTEGER PRIMARY KEY,
 name TEXT NOT NULL,
 working_hours TEXT NOT NULL,
-gps_location TEXT NOT NULL
+place TEXT NOT NULL
 );
 '''
 cursor.execute(create_vaccination_center_table_query)
