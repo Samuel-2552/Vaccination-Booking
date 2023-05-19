@@ -56,7 +56,7 @@ b. Admin
 1. Home.html
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/8effa997-4e46-4d01-ac41-a65870bba0a6)
 2. Sign-Up.html
-   ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/1a05ad36-541b-4c03-b26a-680027e41621)
+   ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/50b2e3df-098a-4759-909e-e6f3d1ed2fef)
 3. Sign-In.html / Admin-Login.html
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/a5a918c5-2705-40e6-b810-1e59b60594e2)
 4. Book-Slots.html
