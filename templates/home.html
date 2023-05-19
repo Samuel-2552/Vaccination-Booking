@@ -13,13 +13,13 @@
     <style>
       /* Light theme styles */
       body.light {
-        background-color: #ffffff;
+        background-color: #b4eafa;
         color: #000000;
       }
 
       /* Dark theme styles */
       body.dark {
-        background-color: #000000;
+        background-color: #251c27;
         color: #ffffff;
       }
       .navbar {
@@ -30,7 +30,7 @@
   <body class="light">
     <nav class="navbar navbar-light">
       <a style="margin-left: 10px;" class="navbar-brand" href="#">
-        <img src="logo.svg" alt="logo" width="50" height="50" style="border-radius: 50%;">
+        <img src="static/logo.svg" alt="logo" width="50" height="50" style="border-radius: 50%;">
       </a>
       <span class="mx-auto"><h2>DevRev's Vaccination Booking</h2></span>
     </nav>
@@ -40,7 +40,10 @@
       <br>
       <label style="margin-left: -50px;" class="form-check-label" for="flexSwitchCheckDefault">Light/Dark</label>
     </div>
-
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top:-65px; margin-right: 10px;">
+        <button class="btn btn-primary me-md-2" type="button" onclick="location.href='/login'">Log-In</button>
+        <button class="btn btn-primary" type="button" onclick="location.href='/signup'">Sign-Up</button>
+    </div>
     <script>
       const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');
       const body = document.querySelector('body');
