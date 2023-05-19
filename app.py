@@ -9,12 +9,12 @@ def home():
 @app.route('/signup')
 def signup():
     # Signup logic
-    return "Signup page"
+    return render_template('signup.html')
 
 @app.route('/login')
 def login():
     # Login logic
-    return "Login page"
+    return render_template('login.html')
 
 @app.route('/search')
 def search():
