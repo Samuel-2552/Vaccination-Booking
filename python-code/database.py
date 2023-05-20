@@ -1,46 +1,61 @@
 import sqlite3
 
-#Create a connection to the SQLite database
+# Connect to the database or create a new one if it doesn't exist
 conn = sqlite3.connect('vaccination_app.db')
 cursor = conn.cursor()
 
-#Create User table
-create_user_table_query = '''
-CREATE TABLE IF NOT EXISTS User (
-id INTEGER PRIMARY KEY,
-username TEXT NOT NULL,
-email TEXT NOT NULL,
-password TEXT NOT NULL
-);
-'''
-cursor.execute(create_user_table_query)
+# Create Admin Table
+cursor.execute('''CREATE TABLE IF NOT EXISTS Admin (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    email_id TEXT,
+                    password TEXT,
+                    otp INTEGER
+                )''')
 
-#Create VaccinationCenter table
-create_vaccination_center_table_query = '''
-CREATE TABLE IF NOT EXISTS VaccinationCenter (
-id INTEGER PRIMARY KEY,
-name TEXT NOT NULL,
-working_hours TEXT NOT NULL,
-place TEXT NOT NULL
-);
-'''
-cursor.execute(create_vaccination_center_table_query)
+# Create User Table
+cursor.execute('''CREATE TABLE IF NOT EXISTS User (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT,
+                    email_id TEXT,
+                    password TEXT,
+                    otp INTEGER
+                )''')
 
-#Create Slot table
-create_slot_table_query = '''
-CREATE TABLE IF NOT EXISTS Slot (
-id INTEGER PRIMARY KEY,
-center_id INTEGER NOT NULL,
-date TEXT NOT NULL,
-capacity INTEGER NOT NULL,
-available_slots INTEGER NOT NULL,
-user_id INTEGER,
-FOREIGN KEY (center_id) REFERENCES VaccinationCenter(id),
-FOREIGN KEY (user_id) REFERENCES User(id)
-);
-'''
-cursor.execute(create_slot_table_query)
+# Create Vaccination Center Table
+cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationCenter (
+                    center_id INTEGER PRIMARY KEY,
+                    admin_email_id TEXT,
+                    place TEXT,
+                    center_name TEXT,
+                    dosage INTEGER,
+                    working_hour TEXT,
+                    FOREIGN KEY (admin_email_id) REFERENCES Admin(email_id)
+                )''')
 
-#Commit the changes and close the connection
+# Create Vaccination Slots Table
+cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationSlots (
+                    slot_id INTEGER PRIMARY KEY,
+                    center_id INTEGER,
+                    slot_date TEXT,
+                    available_slot INTEGER CHECK(available_slot <= 10),
+                    user_email_id TEXT,
+                    FOREIGN KEY (center_id) REFERENCES VaccinationCenter(center_id),
+                    FOREIGN KEY (user_email_id) REFERENCES User(email_id)
+                )''')
+
+# Create User History Table
+cursor.execute('''CREATE TABLE IF NOT EXISTS UserHistory (
+                    booking_id INTEGER PRIMARY KEY,
+                    user_email_id TEXT,
+                    slot_id INTEGER,
+                    center_id INTEGER,
+                    slot_date TEXT,
+                    FOREIGN KEY (user_email_id) REFERENCES User(email_id),
+                    FOREIGN KEY (slot_id) REFERENCES VaccinationSlots(slot_id),
+                    FOREIGN KEY (center_id) REFERENCES VaccinationCenter(center_id)
+                )''')
+
+# Commit the changes and close the connection
 conn.commit()
 conn.close()
