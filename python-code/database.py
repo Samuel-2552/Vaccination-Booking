@@ -6,18 +6,18 @@ cursor = conn.cursor()
 
 # Create Admin Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS Admin (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER,
                     name TEXT,
-                    email_id TEXT,
+                    email_id TEXT PRIMARY KEY,
                     password TEXT,
                     otp INTEGER
                 )''')
 
 # Create User Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS User (
-                    id INTEGER PRIMARY KEY,
+                    id INTEGER,
                     name TEXT,
-                    email_id TEXT,
+                    email_id TEXT PRIMARY KEY,
                     password TEXT,
                     otp INTEGER
                 )''')

@@ -24,7 +24,7 @@ def user_signup():
         cursor = conn.cursor()
         
         insert_user_query = '''
-        INSERT INTO User (username, email, password) VALUES (?, ?, ?)
+        INSERT INTO User (name, email_id, password) VALUES (?, ?, ?)
         '''
         cursor.execute(insert_user_query, (name, email, hashed_password))
         conn.commit()
@@ -52,7 +52,7 @@ def user_login():
         cursor = conn.cursor()
         
         user_query = '''
-        SELECT * FROM User WHERE email = ?
+        SELECT * FROM User WHERE email_id = ?
         '''
         cursor.execute(user_query, (email,))
         user = cursor.fetchone()
@@ -62,7 +62,7 @@ def user_login():
             stored_password = user[3]  # Assuming the password is stored in the 4th column
             if bcrypt.checkpw(password.encode('utf-8'), stored_password):
                 # Set the user ID in the session
-                session['user_id'] = user[0]  # Assuming the user ID is stored in the 1st column
+                session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
                 
                 # Close the connection
                 cursor.close()
@@ -93,7 +93,7 @@ def home():
         cursor = conn.cursor()
         
         user_query = '''
-        SELECT * FROM User WHERE id = ?
+        SELECT * FROM User WHERE email_id = ?
         '''
         cursor.execute(user_query, (user_id,))
         user = cursor.fetchone()
