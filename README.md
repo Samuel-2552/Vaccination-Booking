@@ -47,39 +47,47 @@ b. Admin
 2. Import the required packages (`sqlite3`).
 3. Create a connection to the SQLite database and a cursor object.
 4. Write SQL queries to create the necessary tables for the application.
-   a.) Admin Table:
-         -> Name 
-         -> Email - id (Primary Key)
-         -> Password
-         -> OTP (Number)
 
-   b.) User Table:
-         -> Name 
-         -> Email - id (Primary Key)
-         -> Password
-         -> OTP (Number)
+      ### Admin Table
 
-   c.) Vaccination Center:
-         -> Center id  (Primary Key)
-         -> Email-Id (Admin Foreign Key)
-         -> Place
-         -> Center Name 
-         -> Dosage (Number)
-         -> Working Hour 
+      - **Name**: The name of the admin.
+      - **Email**: The email address of the admin.
+      - **id (Primary Key)**: Unique identifier for the admin.
+      - **Password**: The password associated with the admin's account.
+      - **OTP (Number)**: One-time password used for authentication.
 
-   d.) Vaccination Slots:
-         -> Slot id  (Primary Key)
-         -> Center - Id (Foreign Key)
-         -> Slot Date (Date)
-         -> Available Slot (Number with Constraint max 10)
-         -> Email-Id ( User Foreign Key)
+      ### User Table
 
-   e.) User History:
-         -> Booking id  (Primary Key)
-         -> Email - Id (User Foreign Key)
-         -> Slot Id (Foreign Key)
-         -> Center Id (Foreign Key)
-         -> Slot Date (Foreign Key)
+      - **Name**: The name of the user.
+      - **Email**: The email address of the user.
+      - **id (Primary Key)**: Unique identifier for the user.
+      - **Password**: The password associated with the user's account.
+      - **OTP (Number)**: One-time password used for authentication.
+
+      ### Vaccination Center
+
+      - **Center id (Primary Key)**: Unique identifier for the vaccination center.
+      - **Email-Id (Admin Foreign Key)**: Foreign key referencing the admin table's email id.
+      - **Place**: The location or address of the vaccination center.
+      - **Center Name**: The name of the vaccination center.
+      - **Dosage (Number)**: The dosage number associated with the vaccination center.
+      - **Working Hour**: The operating hours of the vaccination center.
+
+      ### Vaccination Slots
+
+      - **Slot id (Primary Key)**: Unique identifier for the vaccination slot.
+      - **Center - Id (Foreign Key)**: Foreign key referencing the vaccination center table's center id.
+      - **Slot Date (Date)**: The date of the vaccination slot.
+      - **Available Slot (Number with Constraint max 10)**: The number of available slots for vaccination, with a maximum limit of 10.
+      - **Email-Id (User Foreign Key)**: Foreign key referencing the user table's email id.
+
+      ### User History
+
+      - **Booking id (Primary Key)**: Unique identifier for the booking history.
+      - **Email - Id (User Foreign Key)**: Foreign key referencing the user table's email id.
+      - **Slot Id (Foreign Key)**: Foreign key referencing the vaccination slots table's slot id.
+      - **Center Id (Foreign Key)**: Foreign key referencing the vaccination center table's center id.
+      - **Slot Date (Foreign Key)**: Foreign key referencing the vaccination slots table's slot date.
 
 5. Commit the changes and push them to your GitHub repository for backup.
 
