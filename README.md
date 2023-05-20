@@ -93,7 +93,7 @@ b. Admin
 
 ## Rough Database Schema 
 
-![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/4c890f4e-338d-4c2d-857b-9a16f7e5abfd)
+![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/41b3052a-a5e1-45dd-8736-267caed814e6)
 
 
 ## Rough Wireframe for Each Page
