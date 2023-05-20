@@ -108,7 +108,7 @@ def home():
             cursor.close()
             conn.close()
             
-            return f"Welcome, {name}!"
+            return render_template('home.html', name=name)
     
     # User is not logged in, redirect to home page
 
@@ -151,7 +151,7 @@ def admin_login():
             cursor.close()
             conn.close()
             
-            return f"Welcome, {name}!"
+            return redirect('/admin/dashboard')
         
     if request.method == 'POST':
         # Get the user login form data
@@ -214,16 +214,56 @@ def admin_dashboard():
             
             # Example: Get the user's name
             name = user[1]  # Assuming the name is stored in the 2nd column
+
+            # Retrieve the table data from the database
+            table_query = '''
+            SELECT * FROM Admin
+            '''
+            cursor.execute(table_query)
+            table_data = cursor.fetchall()
             
             # Close the connection and cursor
             cursor.close()
             conn.close()
             
-            return f"Welcome, {name}!"
+            return render_template('admin_dash.html', name=name, table_data=table_data)
     
     # User is not logged in, redirect to home page
 
     return render_template('home.html')
+
+
+@app.route('/admin/add_admin', methods=['GET', 'POST'])
+def add_admin():
+    if request.method == 'POST':
+        # Get the user signup form data
+        id = request.form['id']
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Hash the password
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Perform user signup logic here
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        
+        insert_user_query = '''
+        INSERT INTO Admin (id, name, email_id, password) VALUES (?, ?, ?, ?)
+        '''
+        cursor.execute(insert_user_query, (id, name, email, hashed_password))
+        conn.commit()
+        
+        # Close the connection
+        cursor.close()
+        conn.close()
+        
+        # Redirect to the login page after successful signup
+        return  redirect('/admin/dashboard')
+    
+    # Render the user signup form
+    return redirect('/admin/dashboard')
 
 @app.route('/search')
 def search():
