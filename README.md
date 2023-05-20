@@ -47,9 +47,40 @@ b. Admin
 2. Import the required packages (`sqlite3`).
 3. Create a connection to the SQLite database and a cursor object.
 4. Write SQL queries to create the necessary tables for the application.
-   - User table: id, username, email-id, password
-   - VaccinationCenter table: id, name, working_hours, gps_location
-   - Slot table: id, center_id, date, capacity, available_slots, user_names.
+   a.) Admin Table:
+         -> Name 
+         -> Email - id (Primary Key)
+         -> Password
+         -> OTP (Number)
+
+   b.) User Table:
+         -> Name 
+         -> Email - id (Primary Key)
+         -> Password
+         -> OTP (Number)
+
+   c.) Vaccination Center:
+         -> Center id  (Primary Key)
+         -> Email-Id (Admin Foreign Key)
+         -> Place
+         -> Center Name 
+         -> Dosage (Number)
+         -> Working Hour 
+
+   d.) Vaccination Slots:
+         -> Slot id  (Primary Key)
+         -> Center - Id (Foreign Key)
+         -> Slot Date (Date)
+         -> Available Slot (Number with Constraint max 10)
+         -> Email-Id ( User Foreign Key)
+
+   e.) User History:
+         -> Booking id  (Primary Key)
+         -> Email - Id (User Foreign Key)
+         -> Slot Id (Foreign Key)
+         -> Center Id (Foreign Key)
+         -> Slot Date (Foreign Key)
+
 5. Commit the changes and push them to your GitHub repository for backup.
 
 ## Rough Database Schema 
