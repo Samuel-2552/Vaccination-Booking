@@ -85,62 +85,12 @@
         <i class="fas fa-comment"></i>
     </div>
 
-    <!-- Add Center Admins -->
-    <br><br>
-    <div class="container">
-        <div class="card  text-center bg-secondary">
-            <div class="card-header text-white bg-dark ">
-              <h2>Add Center's Admin</h2>
-            </div>
-            <div class="card-body text-white bg-secondary mb-3">
-                    
-                    <!-- Display table from database -->
-                    <form action="/admin/add_admin" method="POST">
-                        <div class="d-grid gap-2 d-md-flex justify-content-center">
-                            <input class="form-control me-2" name="id" type="text" placeholder="id">
-                            <input class="form-control me-2" name="name" type="text" placeholder="name">
-                            <input class="form-control me-2" name="email" type="email" placeholder="email-id">
-                            <input class="form-control me-2" name="password" type="password" placeholder="password">
-                        </div>
-                        <br>
-                            <button type="submit" class="btn btn-primary">Add Now</button>
-                    </form>
-            </div>
-            
-            <div class="card-footer">
-              <h4>Results:</h4>
-              <br>
-              <!-- Display Table -->
-              <table class="table table-striped">
-                <thead class="table-dark">
-                  <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email-Id</th>
-                    <!-- Add more column headings as per your database structure -->
-                  </tr>
-                </thead>
-                <tbody class="table-primary ">
-                  {% for row in table_data %}
-                    <tr>
-                      <td>{{ row[0] }}</td>
-                      <td>{{ row[1] }}</td>
-                      <td>{{ row[2] }}</td>
-                      <!-- Add more columns as per your database structure -->
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Vaccination Center Details -->
     <br><br>
     <div class="container">
         <div class="card  text-center bg-secondary">
             <div class="card-header text-white bg-dark ">
-              <h2>Overall Vaccination Center's</h2>
+              <h2>Vaccination Center</h2>
             </div>
             <div class="card-body text-white bg-secondary mb-3">
                 <!-- Display table from database -->
@@ -157,35 +107,33 @@
             </div>
 
             <div class="card-footer">
-                <h4>Total Vaccine Center's</h4>
+                <h4>Your Vaccine Center's</h4>
                 <br>
                 <!-- Display Table -->
                 <table class="table table-striped">
-                    <thead class="table-dark">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Center Id</th>
+                      <th>Center Name</th>
+                      <th>Place</th>
+                      <th>Working Hours</th>
+                      <th>Dosage</th>
+                      <!-- Add more column headings as per your database structure -->
+                    </tr>
+                  </thead>
+                  <tbody class="table-primary ">
+                    {% for row in table_data %}
                       <tr>
-                        <th>Center Id</th>
-                        <th>Center Name</th>
-                        <th>Place</th>
-                        <th>Working Hours</th>
-                        <th>Dosage</th>
-                        <th>Email-Id</th>
-                        <!-- Add more column headings as per your database structure -->
+                        <td>{{ row[0] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[5] }}</td>
+                        <td>{{ row[4] }}</td>
+                        <!-- Add more columns as per your database structure -->
                       </tr>
-                    </thead>
-                    <tbody class="table-primary ">
-                      {% for row in table_data2 %}
-                        <tr>
-                          <td>{{ row[0] }}</td>
-                          <td>{{ row[3] }}</td>
-                          <td>{{ row[2] }}</td>
-                          <td>{{ row[5] }}</td>
-                          <td>{{ row[4] }}</td>
-                          <td>{{ row[1] }}</td>
-                          <!-- Add more columns as per your database structure -->
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
+                    {% endfor %}
+                  </tbody>
+                </table>
             </div>
 
         </div>

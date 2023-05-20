@@ -68,11 +68,16 @@
             for="flexSwitchCheckDefault">Light/Dark</label>
     </div>
 
-    <!-- Log-In and Sign-Up Buttons -->
+    <!-- Log-In, Sign-Up, and Logout Buttons -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top:-65px; margin-right: 10px;">
-        <button class="btn btn-primary me-md-2" type="button" onclick="location.href='/login'">Log-In</button>
-        <button class="btn btn-primary" type="button" onclick="location.href='/signup'">Sign-Up</button>
+        {% if show_logout %}
+        <a class="btn btn-primary me-md-2" href="/logout">Logout</a>
+        {% else %}
+        <a class="btn btn-primary me-md-2" href="/login">Log-In</a>
+        <a class="btn btn-primary" href="/signup">Sign-Up</a>
+        {% endif %}
     </div>
+  
 
     <!-- Carousel For Images -->
     <div class="container" style="width:700px; margin-top: -30px;">
@@ -115,9 +120,6 @@
     <div class="chat-icon" onclick="openChat()">
         <i class="fas fa-comment"></i>
     </div>
-
-    <br><br>
-    <center><h2>Hi {{name}}! Book your slot now!</h2></center>
 
     <!-- Blog about Vaccine -->
     <br><br>

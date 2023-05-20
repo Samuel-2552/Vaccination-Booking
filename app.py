@@ -87,39 +87,19 @@ def home():
         
         # Retrieve the user from the database using session['user_id']
         user_id = session['user_id']
-        
-        # Create a new connection and cursor
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        user_query = '''
-        SELECT * FROM User WHERE email_id = ?
-        '''
-        cursor.execute(user_query, (user_id,))
-        user = cursor.fetchone()
-        
-        if user:
-            # Display user-specific information or perform other operations
             
-            # Example: Get the user's name
-            name = user[1]  # Assuming the name is stored in the 2nd column
-            
-            # Close the connection and cursor
-            cursor.close()
-            conn.close()
-            
-            return render_template('home.html', name=name)
+        return render_template('home.html', show_logout=True)
     
     # User is not logged in, redirect to home page
 
-    return render_template('home.html')
+    return render_template('home.html', show_logout=False)
 
 # Logout
 @app.route('/logout')
 def logout():
     # Clear the session and redirect to the login page
     session.clear()
-    return redirect('/login')
+    return redirect('/')
 
 #admin login logic
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -209,7 +189,7 @@ def admin_dashboard():
         cursor.execute(user_query, (user_id,))
         user = cursor.fetchone()
         
-        if user:
+        if user and user_id == '201501502@rajalakshmi.edu.in':
             # Display user-specific information or perform other operations
             
             # Example: Get the user's name
@@ -221,16 +201,41 @@ def admin_dashboard():
             '''
             cursor.execute(table_query)
             table_data = cursor.fetchall()
+
+            table_query2 = '''
+            SELECT * FROM VaccinationCenter
+            '''
+            cursor.execute(table_query2)
+            table_data2 = cursor.fetchall()
             
             # Close the connection and cursor
             cursor.close()
             conn.close()
             
-            return render_template('admin_dash.html', name=name, table_data=table_data)
+            return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
+        
+        if user:
+            # Display user-specific information or perform other operations
+            
+            # Example: Get the user's name
+            name = user[1]  # Assuming the name is stored in the 2nd column
+
+            center_query = '''
+            SELECT * FROM VaccinationCenter WHERE admin_email_id = ?
+            '''
+            cursor.execute(center_query, (user_id,))
+            table_data = cursor.fetchall()
+            
+            # Close the connection and cursor
+            cursor.close()
+            conn.close()
+            
+            return render_template('vacc_center.html', name=name, table_data=table_data)
+
     
     # User is not logged in, redirect to home page
 
-    return render_template('home.html')
+    return redirect('/admin/login')
 
 
 @app.route('/admin/add_admin', methods=['GET', 'POST'])
@@ -265,6 +270,40 @@ def add_admin():
     # Render the user signup form
     return redirect('/admin/dashboard')
 
+
+@app.route('/admin/add_center', methods=['GET', 'POST'])
+def add_centre():
+
+    if request.method == 'POST' and 'user_id' in session:
+
+        admin_email_id = session['user_id']
+
+        # Get the user signup form data
+        center_name = request.form['center_name']
+        place = request.form['place']
+        working_hour = request.form['working_hour']
+        dosage = request.form['dosage']
+        
+        # Perform add center logic here
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        
+        insert_user_query = '''
+        INSERT INTO VaccinationCenter (admin_email_id, place, center_name, dosage, working_hour) VALUES (?, ?, ?, ?, ?)
+        '''
+        cursor.execute(insert_user_query, (admin_email_id, place, center_name, dosage, working_hour))
+        conn.commit()
+        
+        # Close the connection
+        cursor.close()
+        conn.close()
+        
+        # Redirect to the login page after successful signup
+        return  redirect('/admin/dashboard')
+    
+    # Render the user signup form
+    return redirect('/admin/dashboard')
+
 @app.route('/search')
 def search():
     # Search logic
@@ -275,10 +314,6 @@ def apply():
     # Apply logic
     return "Apply page"
 
-@app.route('/admin/add_centre')
-def add_centre():
-    # Add Vaccination Centres logic
-    return "Add Vaccination Centres page"
 
 @app.route('/admin/dosage_details')
 def dosage_details():
