@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 import bcrypt
 
@@ -271,6 +271,27 @@ def add_admin():
     return redirect('/admin/dashboard')
 
 
+@app.route('/admin/remove/<int:id>', methods=['GET', 'POST'])
+def remove_admin(id):
+    if request.method == 'POST':
+        # Delete the admin with the given ID from the database
+        connection = sqlite3.connect('vaccination_app.db')
+        cursor = connection.cursor()
+        
+        try:
+            cursor.execute("DELETE FROM Admin WHERE id = ?", (id,))
+            connection.commit()
+            flash('Admin successfully removed')
+        except sqlite3.Error as e:
+            connection.rollback()
+            flash('An error occurred while removing the admin')
+            print('SQLite error occurred:', e.args[0])
+
+        connection.close()
+
+    return redirect('/admin/dashboard')
+
+
 @app.route('/admin/add_center', methods=['GET', 'POST'])
 def add_centre():
 
@@ -304,6 +325,28 @@ def add_centre():
     # Render the user signup form
     return redirect('/admin/dashboard')
 
+
+@app.route('/admin/remove_center/<int:center_id>', methods=['GET', 'POST'])
+def remove_center(center_id):
+    if request.method == 'POST':
+        # Delete the vaccination center with the given ID from the database
+        connection = sqlite3.connect('vaccination_app.db')
+        cursor = connection.cursor()
+        
+        try:
+            cursor.execute("DELETE FROM VaccinationCenter WHERE center_id = ?", (center_id,))
+            connection.commit()
+            flash('Vaccination center successfully removed')
+        except sqlite3.Error as e:
+            connection.rollback()
+            flash('An error occurred while removing the vaccination center')
+            print('SQLite error occurred:', e.args[0])
+
+        connection.close()
+
+    return redirect('/admin/dashboard')  # Redirect to the admin page after deleting
+
+
 @app.route('/search')
 def search():
     # Search logic
@@ -320,10 +363,6 @@ def dosage_details():
     # Get dosage details logic
     return "Get dosage details page"
 
-@app.route('/admin/remove_centre')
-def remove_centre():
-    # Remove vaccination centres logic
-    return "Remove vaccination centres page"
 
 if __name__ == '__main__':
     app.run('0.0.0.0', debug=True)
