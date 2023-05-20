@@ -46,6 +46,23 @@
             cursor: pointer;
         }
     </style>
+    <!-- Jquery CDN -->
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script>
+        $(document).ready(function() {
+          $('a.delete-center').click(function(event) {
+            event.preventDefault();  // Prevent the default link behavior
+        
+            var centerId = $(this).attr('href').split('/').pop();
+            var confirmation = confirm('Are you sure you want to remove this center?');
+            if (confirmation) {
+              $.post('/admin/remove_center/' + centerId, function(data) {
+                location.reload();  // Refresh the page after successful deletion
+              });
+            }
+          });
+        });
+        </script>
 </head>
 
 <body class="light">
@@ -96,10 +113,10 @@
                 <!-- Display table from database -->
                 <form action="/admin/add_center" method="POST">
                     <div class="d-grid gap-2 d-md-flex justify-content-center">
-                        <input class="form-control me-2" name="center_name" type="text" placeholder="Center Name">
-                        <input class="form-control me-2" name="place" type="text" placeholder="Place">
-                        <input class="form-control me-2" name="working_hour" type="text" placeholder="Working Hours (09:00 AM - 11:00 AM)">
-                        <input class="form-control me-2" name="dosage" type="number" placeholder="Dosage Available">
+                        <input class="form-control me-2" name="center_name" type="text" required placeholder="Center Name">
+                        <input class="form-control me-2" name="place" type="text" required placeholder="Place">
+                        <input class="form-control me-2" name="working_hour" type="text" required placeholder="Working Hours (09:00 AM - 11:00 AM)">
+                        <input class="form-control me-2" name="dosage" type="number" required placeholder="Dosage Available">
                     </div>
                     <br>
                         <button type="submit" class="btn btn-primary">Add Center</button>
@@ -118,6 +135,7 @@
                       <th>Place</th>
                       <th>Working Hours</th>
                       <th>Dosage</th>
+                      <th>Remove Center</th>
                       <!-- Add more column headings as per your database structure -->
                     </tr>
                   </thead>
@@ -129,6 +147,11 @@
                         <td>{{ row[2] }}</td>
                         <td>{{ row[5] }}</td>
                         <td>{{ row[4] }}</td>
+                        <td>
+                            <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
+                              <i class="fas fa-trash-alt"></i>
+                            </a>
+                          </td>
                         <!-- Add more columns as per your database structure -->
                       </tr>
                     {% endfor %}

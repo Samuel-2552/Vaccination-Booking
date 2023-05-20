@@ -10,31 +10,34 @@ app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session e
 # User signup logic
 @app.route('/signup', methods=['GET', 'POST'])
 def user_signup():
-    if request.method == 'POST':
-        # Get the user signup form data
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        
-        # Hash the password
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        
-        # Perform user signup logic here
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        insert_user_query = '''
-        INSERT INTO User (name, email_id, password) VALUES (?, ?, ?)
-        '''
-        cursor.execute(insert_user_query, (name, email, hashed_password))
-        conn.commit()
-        
-        # Close the connection
-        cursor.close()
-        conn.close()
-        
-        # Redirect to the login page after successful signup
-        return redirect('/login')
+    try:
+        if request.method == 'POST':
+            # Get the user signup form data
+            name = request.form['name']
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Hash the password
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            
+            # Perform user signup logic here
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            insert_user_query = '''
+            INSERT INTO User (name, email_id, password) VALUES (?, ?, ?)
+            '''
+            cursor.execute(insert_user_query, (name, email, hashed_password))
+            conn.commit()
+            
+            # Close the connection
+            cursor.close()
+            conn.close()
+            
+            # Redirect to the login page after successful signup
+            return redirect('/login')
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # Render the user signup form
     return render_template('signup.html')
@@ -42,53 +45,59 @@ def user_signup():
 # User login logic
 @app.route('/login', methods=['GET', 'POST'])
 def user_login():
-    if request.method == 'POST':
-        # Get the user login form data
-        email = request.form['email']
-        password = request.form['password']
-        
-        # Retrieve the user from the database
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        user_query = '''
-        SELECT * FROM User WHERE email_id = ?
-        '''
-        cursor.execute(user_query, (email,))
-        user = cursor.fetchone()
-        
-        if user:
-            # Verify the password
-            stored_password = user[3]  # Assuming the password is stored in the 4th column
-            if bcrypt.checkpw(password.encode('utf-8'), stored_password):
-                # Set the user ID in the session
-                session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
-                
-                # Close the connection
-                cursor.close()
-                conn.close()
-                
-                # Redirect to the home page after successful login
-                return redirect('/')
-        
-        # Invalid credentials, display an error message or redirect to the login page
-        cursor.close()
-        conn.close()
-        return "Invalid credentials"
+    try:
+        if request.method == 'POST':
+            # Get the user login form data
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Retrieve the user from the database
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            user_query = '''
+            SELECT * FROM User WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (email,))
+            user = cursor.fetchone()
+            
+            if user:
+                # Verify the password
+                stored_password = user[3]  # Assuming the password is stored in the 4th column
+                if bcrypt.checkpw(password.encode('utf-8'), stored_password):
+                    # Set the user ID in the session
+                    session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
+                    
+                    # Close the connection
+                    cursor.close()
+                    conn.close()
+                    
+                    # Redirect to the home page after successful login
+                    return redirect('/')
+            
+            # Invalid credentials, display an error message or redirect to the login page
+            cursor.close()
+            conn.close()
+            return "Invalid credentials"
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # Render the user login form
     return render_template('login.html')
 
 @app.route('/')
 def home():
-    # Check if the user is logged in
-    if 'user_id' in session:
-        # User is logged in, perform required logic
-        
-        # Retrieve the user from the database using session['user_id']
-        user_id = session['user_id']
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
             
-        return render_template('home.html', show_logout=True)
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+                
+            return render_template('home.html', show_logout=True)
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # User is not logged in, redirect to home page
 
@@ -104,115 +113,122 @@ def logout():
 #admin login logic
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    # Check if the user is logged in
-    if 'user_id' in session:
-        # User is logged in, perform required logic
-        
-        # Retrieve the user from the database using session['user_id']
-        user_id = session['user_id']
-        
-        # Create a new connection and cursor
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        user_query = '''
-        SELECT * FROM Admin WHERE email_id = ?
-        '''
-        cursor.execute(user_query, (user_id,))
-        user = cursor.fetchone()
-        
-        if user:
-            # Display user-specific information or perform other operations
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
             
-            # Example: Get the user's name
-            name = user[1]  # Assuming the name is stored in the 2nd column
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
             
-            # Close the connection and cursor
-            cursor.close()
-            conn.close()
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
             
-            return redirect('/admin/dashboard')
-        
-    if request.method == 'POST':
-        # Get the user login form data
-        email = request.form['email']
-        password = request.form['password']
-        
-        # Retrieve the user from the database
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        user_query = '''
-        SELECT * FROM Admin WHERE email_id = ?
-        '''
-        cursor.execute(user_query, (email,))
-        user = cursor.fetchone()
-        
-        if user:
-            # Verify the password
-            stored_password = user[3]  # Assuming the password is stored in the 4th column
-            if bcrypt.checkpw(password.encode('utf-8'), stored_password):
-                # Set the user ID in the session
-                session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
+            user_query = '''
+            SELECT * FROM Admin WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+            
+            if user:
+                # Display user-specific information or perform other operations
                 
-                # Close the connection
+                # Example: Get the user's name
+                name = user[1]  # Assuming the name is stored in the 2nd column
+                
+                # Close the connection and cursor
                 cursor.close()
                 conn.close()
                 
-                # Redirect to the home page after successful login
                 return redirect('/admin/dashboard')
+    except:
+        return "Ran into Some Issues go back and Try Again."
         
-        # Invalid credentials, display an error message or redirect to the login page
-        cursor.close()
-        conn.close()
-        return "Invalid credentials"
+    try:
+        if request.method == 'POST':
+            # Get the user login form data
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Retrieve the user from the database
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            user_query = '''
+            SELECT * FROM Admin WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (email,))
+            user = cursor.fetchone()
+            
+            if user:
+                # Verify the password
+                stored_password = user[3]  # Assuming the password is stored in the 4th column
+                if bcrypt.checkpw(password.encode('utf-8'), stored_password):
+                    # Set the user ID in the session
+                    session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
+                    
+                    # Close the connection
+                    cursor.close()
+                    conn.close()
+                    
+                    # Redirect to the home page after successful login
+                    return redirect('/admin/dashboard')
+            
+            # Invalid credentials, display an error message or redirect to the login page
+            cursor.close()
+            conn.close()
+            return "Invalid credentials"
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # Render the user login form
     return render_template('admin_login.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    # Check if the user is logged in
-    if 'user_id' in session:
-        # User is logged in, perform required logic
-        
-        # Retrieve the user from the database using session['user_id']
-        user_id = session['user_id']
-        
-        # Create a new connection and cursor
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        user_query = '''
-        SELECT * FROM Admin WHERE email_id = ?
-        '''
-        cursor.execute(user_query, (user_id,))
-        user = cursor.fetchone()
-        
-        if user and user_id == '201501502@rajalakshmi.edu.in':
-            # Display user-specific information or perform other operations
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
             
-            # Example: Get the user's name
-            name = user[1]  # Assuming the name is stored in the 2nd column
-
-            # Retrieve the table data from the database
-            table_query = '''
-            SELECT * FROM Admin
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+            
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            user_query = '''
+            SELECT * FROM Admin WHERE email_id = ?
             '''
-            cursor.execute(table_query)
-            table_data = cursor.fetchall()
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+            
+            if user and user_id == '201501502@rajalakshmi.edu.in':
+                # Display user-specific information or perform other operations
+                
+                # Example: Get the user's name
+                name = user[1]  # Assuming the name is stored in the 2nd column
 
-            table_query2 = '''
-            SELECT * FROM VaccinationCenter
-            '''
-            cursor.execute(table_query2)
-            table_data2 = cursor.fetchall()
-            
-            # Close the connection and cursor
-            cursor.close()
-            conn.close()
-            
-            return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
+                # Retrieve the table data from the database
+                table_query = '''
+                SELECT * FROM Admin
+                '''
+                cursor.execute(table_query)
+                table_data = cursor.fetchall()
+
+                table_query2 = '''
+                SELECT * FROM VaccinationCenter
+                '''
+                cursor.execute(table_query2)
+                table_data2 = cursor.fetchall()
+                
+                # Close the connection and cursor
+                cursor.close()
+                conn.close()
+                
+                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
         
         if user:
             # Display user-specific information or perform other operations
@@ -231,6 +247,9 @@ def admin_dashboard():
             conn.close()
             
             return render_template('vacc_center.html', name=name, table_data=table_data)
+        
+    except:
+        return "Ran into Some Issues go back and Try Again."
 
     
     # User is not logged in, redirect to home page
@@ -240,32 +259,35 @@ def admin_dashboard():
 
 @app.route('/admin/add_admin', methods=['GET', 'POST'])
 def add_admin():
-    if request.method == 'POST':
-        # Get the user signup form data
-        id = request.form['id']
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        
-        # Hash the password
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        
-        # Perform user signup logic here
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        insert_user_query = '''
-        INSERT INTO Admin (id, name, email_id, password) VALUES (?, ?, ?, ?)
-        '''
-        cursor.execute(insert_user_query, (id, name, email, hashed_password))
-        conn.commit()
-        
-        # Close the connection
-        cursor.close()
-        conn.close()
-        
-        # Redirect to the login page after successful signup
-        return  redirect('/admin/dashboard')
+    try:
+        if request.method == 'POST':
+            # Get the user signup form data
+            id = request.form['id']
+            name = request.form['name']
+            email = request.form['email']
+            password = request.form['password']
+            
+            # Hash the password
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            
+            # Perform user signup logic here
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            insert_user_query = '''
+            INSERT INTO Admin (id, name, email_id, password) VALUES (?, ?, ?, ?)
+            '''
+            cursor.execute(insert_user_query, (id, name, email, hashed_password))
+            conn.commit()
+            
+            # Close the connection
+            cursor.close()
+            conn.close()
+            
+            # Redirect to the login page after successful signup
+            return  redirect('/admin/dashboard')
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # Render the user signup form
     return redirect('/admin/dashboard')
@@ -273,21 +295,24 @@ def add_admin():
 
 @app.route('/admin/remove/<int:id>', methods=['GET', 'POST'])
 def remove_admin(id):
-    if request.method == 'POST':
-        # Delete the admin with the given ID from the database
-        connection = sqlite3.connect('vaccination_app.db')
-        cursor = connection.cursor()
-        
-        try:
-            cursor.execute("DELETE FROM Admin WHERE id = ?", (id,))
-            connection.commit()
-            flash('Admin successfully removed')
-        except sqlite3.Error as e:
-            connection.rollback()
-            flash('An error occurred while removing the admin')
-            print('SQLite error occurred:', e.args[0])
+    try:
+        if request.method == 'POST':
+            # Delete the admin with the given ID from the database
+            connection = sqlite3.connect('vaccination_app.db')
+            cursor = connection.cursor()
+            
+            try:
+                cursor.execute("DELETE FROM Admin WHERE id = ?", (id,))
+                connection.commit()
+                flash('Admin successfully removed')
+            except sqlite3.Error as e:
+                connection.rollback()
+                flash('An error occurred while removing the admin')
+                print('SQLite error occurred:', e.args[0])
 
-        connection.close()
+            connection.close()
+    except:
+        return "Ran into Some Issues go back and Try Again."
 
     return redirect('/admin/dashboard')
 
@@ -295,32 +320,36 @@ def remove_admin(id):
 @app.route('/admin/add_center', methods=['GET', 'POST'])
 def add_centre():
 
-    if request.method == 'POST' and 'user_id' in session:
+    try:
+        if request.method == 'POST' and 'user_id' in session:
 
-        admin_email_id = session['user_id']
+            admin_email_id = session['user_id']
 
-        # Get the user signup form data
-        center_name = request.form['center_name']
-        place = request.form['place']
-        working_hour = request.form['working_hour']
-        dosage = request.form['dosage']
+            # Get the user signup form data
+            center_name = request.form['center_name']
+            place = request.form['place']
+            working_hour = request.form['working_hour']
+            dosage = request.form['dosage']
+            
+            # Perform add center logic here
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+            
+            insert_user_query = '''
+            INSERT INTO VaccinationCenter (admin_email_id, place, center_name, dosage, working_hour) VALUES (?, ?, ?, ?, ?)
+            '''
+            cursor.execute(insert_user_query, (admin_email_id, place, center_name, dosage, working_hour))
+            conn.commit()
+            
+            # Close the connection
+            cursor.close()
+            conn.close()
+            
+            # Redirect to the login page after successful signup
+            return  redirect('/admin/dashboard')
         
-        # Perform add center logic here
-        conn = sqlite3.connect('vaccination_app.db')
-        cursor = conn.cursor()
-        
-        insert_user_query = '''
-        INSERT INTO VaccinationCenter (admin_email_id, place, center_name, dosage, working_hour) VALUES (?, ?, ?, ?, ?)
-        '''
-        cursor.execute(insert_user_query, (admin_email_id, place, center_name, dosage, working_hour))
-        conn.commit()
-        
-        # Close the connection
-        cursor.close()
-        conn.close()
-        
-        # Redirect to the login page after successful signup
-        return  redirect('/admin/dashboard')
+    except:
+        return "Ran into Some Issues go back and Try Again."
     
     # Render the user signup form
     return redirect('/admin/dashboard')
@@ -328,21 +357,24 @@ def add_centre():
 
 @app.route('/admin/remove_center/<int:center_id>', methods=['GET', 'POST'])
 def remove_center(center_id):
-    if request.method == 'POST':
-        # Delete the vaccination center with the given ID from the database
-        connection = sqlite3.connect('vaccination_app.db')
-        cursor = connection.cursor()
-        
-        try:
-            cursor.execute("DELETE FROM VaccinationCenter WHERE center_id = ?", (center_id,))
-            connection.commit()
-            flash('Vaccination center successfully removed')
-        except sqlite3.Error as e:
-            connection.rollback()
-            flash('An error occurred while removing the vaccination center')
-            print('SQLite error occurred:', e.args[0])
+    try:
+        if request.method == 'POST':
+            # Delete the vaccination center with the given ID from the database
+            connection = sqlite3.connect('vaccination_app.db')
+            cursor = connection.cursor()
+            
+            try:
+                cursor.execute("DELETE FROM VaccinationCenter WHERE center_id = ?", (center_id,))
+                connection.commit()
+                flash('Vaccination center successfully removed')
+            except sqlite3.Error as e:
+                connection.rollback()
+                flash('An error occurred while removing the vaccination center')
+                print('SQLite error occurred:', e.args[0])
 
-        connection.close()
+            connection.close()
+    except:
+        return "Ran into Some Issues go back and Try Again."
 
     return redirect('/admin/dashboard')  # Redirect to the admin page after deleting
 
