@@ -121,6 +121,110 @@ def logout():
     session.clear()
     return redirect('/login')
 
+#admin login logic
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    # Check if the user is logged in
+    if 'user_id' in session:
+        # User is logged in, perform required logic
+        
+        # Retrieve the user from the database using session['user_id']
+        user_id = session['user_id']
+        
+        # Create a new connection and cursor
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        
+        user_query = '''
+        SELECT * FROM Admin WHERE email_id = ?
+        '''
+        cursor.execute(user_query, (user_id,))
+        user = cursor.fetchone()
+        
+        if user:
+            # Display user-specific information or perform other operations
+            
+            # Example: Get the user's name
+            name = user[1]  # Assuming the name is stored in the 2nd column
+            
+            # Close the connection and cursor
+            cursor.close()
+            conn.close()
+            
+            return f"Welcome, {name}!"
+        
+    if request.method == 'POST':
+        # Get the user login form data
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Retrieve the user from the database
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        
+        user_query = '''
+        SELECT * FROM Admin WHERE email_id = ?
+        '''
+        cursor.execute(user_query, (email,))
+        user = cursor.fetchone()
+        
+        if user:
+            # Verify the password
+            stored_password = user[3]  # Assuming the password is stored in the 4th column
+            if bcrypt.checkpw(password.encode('utf-8'), stored_password):
+                # Set the user ID in the session
+                session['user_id'] = user[2]  # Assuming the user ID is stored in the 1st column
+                
+                # Close the connection
+                cursor.close()
+                conn.close()
+                
+                # Redirect to the home page after successful login
+                return redirect('/admin/dashboard')
+        
+        # Invalid credentials, display an error message or redirect to the login page
+        cursor.close()
+        conn.close()
+        return "Invalid credentials"
+    
+    # Render the user login form
+    return render_template('admin_login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    # Check if the user is logged in
+    if 'user_id' in session:
+        # User is logged in, perform required logic
+        
+        # Retrieve the user from the database using session['user_id']
+        user_id = session['user_id']
+        
+        # Create a new connection and cursor
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        
+        user_query = '''
+        SELECT * FROM Admin WHERE email_id = ?
+        '''
+        cursor.execute(user_query, (user_id,))
+        user = cursor.fetchone()
+        
+        if user:
+            # Display user-specific information or perform other operations
+            
+            # Example: Get the user's name
+            name = user[1]  # Assuming the name is stored in the 2nd column
+            
+            # Close the connection and cursor
+            cursor.close()
+            conn.close()
+            
+            return f"Welcome, {name}!"
+    
+    # User is not logged in, redirect to home page
+
+    return render_template('home.html')
+
 @app.route('/search')
 def search():
     # Search logic
@@ -130,11 +234,6 @@ def search():
 def apply():
     # Apply logic
     return "Apply page"
-
-@app.route('/admin/login')
-def admin_login():
-    # Admin login logic
-    return "Admin login page"
 
 @app.route('/admin/add_centre')
 def add_centre():

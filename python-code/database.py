@@ -24,7 +24,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS User (
 
 # Create Vaccination Center Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationCenter (
-                    center_id INTEGER PRIMARY KEY,
+                    center_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     admin_email_id TEXT,
                     place TEXT,
                     center_name TEXT,
@@ -35,7 +35,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationCenter (
 
 # Create Vaccination Slots Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationSlots (
-                    slot_id INTEGER PRIMARY KEY,
+                    slot_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     center_id INTEGER,
                     slot_date TEXT,
                     available_slot INTEGER CHECK(available_slot <= 10),
@@ -46,7 +46,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS VaccinationSlots (
 
 # Create User History Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS UserHistory (
-                    booking_id INTEGER PRIMARY KEY,
+                    booking_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_email_id TEXT,
                     slot_id INTEGER,
                     center_id INTEGER,
