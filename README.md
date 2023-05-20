@@ -52,6 +52,11 @@ b. Admin
    - Slot table: id, center_id, date, capacity, available_slots, user_names.
 5. Commit the changes and push them to your GitHub repository for backup.
 
+## Rough Database Schema 
+
+![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/4c890f4e-338d-4c2d-857b-9a16f7e5abfd)
+
+
 ## Rough Wireframe for Each Page
 1. Home.html
    ![image](https://github.com/Samuel-2552/Vaccination-Booking/assets/104893913/8effa997-4e46-4d01-ac41-a65870bba0a6)
