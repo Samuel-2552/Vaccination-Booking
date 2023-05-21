@@ -179,7 +179,17 @@
                                         <td>{{ row[2] }}</td>
                                         <td>{{ row[5] }}</td>
                                         <td>10</td>
-                                        <td><button type="button" class="btn btn-primary">Book</button></td>
+                                        <td>
+                                            {% if 'user_id' in session %}
+                                                {% if 10 %}
+                                                    <button type="button" class="btn btn-primary" onclick="alert('Your Slot is booked.')">Book</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-secondary" disabled>Booked</button>
+                                                {% endif %}
+                                            {% else %}
+                                                <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot')">Book</button>
+                                            {% endif %}
+                                        </td>
                                         <!-- Add more cells for other columns -->
                                     </tr>
                                 {% endfor %}
