@@ -112,8 +112,9 @@ def home():
                 hour = request.form['hour']
 
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? AND working_hour = ?", (center, hour))
+                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? OR working_hour = ?", (center, hour))
                 rows = cursor.fetchall()
+                
 
                 # Close the connection and cursor
                 cursor.close()
@@ -143,8 +144,10 @@ def home():
                 center = request.form['center']
                 hour = request.form['hour']
 
+                print("This is debugging",center,hour)
+
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? AND working_hour = ?", (center, hour))
+                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? OR working_hour = ?", (center, hour))
                 rows = cursor.fetchall()
                 print(rows)
                 # Close the connection and cursor

@@ -164,6 +164,8 @@
                                     <th scope="col">Center Name</th>
                                     <th scope="col">Location</th>
                                     <th scope="col">Working Hour</th>
+                                    <th scope="col">Available Slots</th>
+                                    <th scope="col">Book Now</th>
                                     <!-- Add more columns as needed -->
                                 </tr>
                             </thead>
@@ -173,6 +175,8 @@
                                         <td>{{ row[3] }}</td>
                                         <td>{{ row[2] }}</td>
                                         <td>{{ row[5] }}</td>
+                                        <td>10</td>
+                                        <td><button type="button" class="btn btn-primary">Book</button></td>
                                         <!-- Add more cells for other columns -->
                                     </tr>
                                 {% endfor %}
