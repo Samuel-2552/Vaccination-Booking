@@ -85,23 +85,86 @@ def user_login():
     # Render the user login form
     return render_template('login.html')
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     try:
         # Check if the user is logged in
         if 'user_id' in session:
             # User is logged in, perform required logic
-            
+
             # Retrieve the user from the database using session['user_id']
             user_id = session['user_id']
-                
-            return render_template('home.html', show_logout=True)
-    except:
-        return "Ran into Some Issues go back and Try Again."
-    
-    # User is not logged in, redirect to home page
 
-    return render_template('home.html', show_logout=False)
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+
+            # Query the database to fetch the list of vaccination centers
+            cursor.execute("SELECT DISTINCT center_name FROM VaccinationCenter")
+            centers = cursor.fetchall()
+
+            cursor.execute("SELECT DISTINCT working_hour FROM VaccinationCenter")
+            hours = cursor.fetchall()
+
+            # Check if the search form is submitted
+            if request.method == 'POST':
+                center = request.form['center']
+                hour = request.form['hour']
+
+                # Query the database to fetch the rows matching the selected criteria
+                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? AND working_hour = ?", (center, hour))
+                rows = cursor.fetchall()
+
+                # Close the connection and cursor
+                cursor.close()
+                conn.close()
+
+                # Render the template with the search results
+                return render_template('home.html', show_logout=True, vaccination_centers=centers, hours=hours, rows=rows)
+
+            # Close the connection and cursor
+            cursor.close()
+            conn.close()
+
+            return render_template('home.html', show_logout=True, vaccination_centers=centers, hours=hours)
+        else:
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination_app.db')
+            cursor = conn.cursor()
+
+            # Query the database to fetch the list of vaccination centers
+            cursor.execute("SELECT DISTINCT center_name FROM VaccinationCenter")
+            centers = cursor.fetchall()
+
+            cursor.execute("SELECT DISTINCT working_hour FROM VaccinationCenter")
+            hours = cursor.fetchall()
+            # Check if the search form is submitted
+            if request.method == 'POST':
+                center = request.form['center']
+                hour = request.form['hour']
+
+                # Query the database to fetch the rows matching the selected criteria
+                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? AND working_hour = ?", (center, hour))
+                rows = cursor.fetchall()
+                print(rows)
+                # Close the connection and cursor
+                cursor.close()
+                conn.close()
+
+                # Render the template with the search results
+                return render_template('home.html', show_logout=False, vaccination_centers=centers, hours=hours, rows=rows)
+
+            # Close the connection and cursor
+            cursor.close()
+            conn.close()
+            
+    # User is not logged in, redirect to the home page
+            return render_template('home.html', show_logout=False, vaccination_centers=centers, hours=hours)
+    except Exception as e:
+        print(e)
+        return "Ran into Some Issues. Please go back and try again."
+
+
 
 # Logout
 @app.route('/logout')

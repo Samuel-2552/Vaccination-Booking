@@ -132,35 +132,54 @@
                     </div>
                     <div class="card-body text-white bg-secondary mb-3">
                         <div class="d-grid gap-2 d-md-flex justify-content-center">
-                            <div class="dropdown">
-                                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                Vaccination Center
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                                <li><a class="dropdown-item active" href="#">Vanagaram</a></li>
-                                <li><a class="dropdown-item" href="#">Porur</a></li>
-                                <li><a class="dropdown-item" href="#">Mylapore</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#"><input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"></a></li>
-                                </ul>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                Working Hour
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                                <li><a class="dropdown-item active" href="#">09:00 AM - 11:00 AM</a></li>
-                                <li><a class="dropdown-item" href="#">12:00 PM - 02:00 PM</a></li>
-                                <li><a class="dropdown-item" href="#">04:00 PM - 06:00 PM</a></li>
-                                </ul>
-                            </div>
+                            <form action="/" method="POST" class="d-grid gap-2 d-md-flex justify-content-center">
+                                <form action="/" method="POST" class="d-grid gap-2 d-md-flex justify-content-center">
+                                    <div class="dropdown">
+                                        <label for="center">Vaccination Center:</label>
+                                        <select name="center" id="center" class="form-select">
+                                            {% for center in vaccination_centers %}
+                                            <option value="{{ center[0] }}">{{ center[0] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="dropdown">
+                                        <label for="hour">Working Hours:</label>
+                                        <select name="hour" id="hour" class="form-select">
+                                            {% for hour in hours %}
+                                            <option value="{{ hour[0] }}">{{ hour[0] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Search Now</button>
+                            </form>
                         </div>
-                          <br>
-                      <a href="#" class="btn btn-primary">Search Now</a>
+                          
                     </div>
-                    <!-- <div class="card-footer text-muted">
-                      2 days ago
-                    </div> -->
+                    <div class="card-footer">
+                        {% if rows %}
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Center Name</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Working Hour</th>
+                                    <!-- Add more columns as needed -->
+                                </tr>
+                            </thead>
+                            <tbody class="table-primary ">
+                                {% for row in rows %}
+                                    <tr>
+                                        <td>{{ row[3] }}</td>
+                                        <td>{{ row[2] }}</td>
+                                        <td>{{ row[5] }}</td>
+                                        <!-- Add more cells for other columns -->
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                    </div>
                   </div>
             </div>
         </div>
