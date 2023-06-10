@@ -125,13 +125,13 @@ def home():
                 conn.close()
 
                 # Render the template with the search results
-                return render_template('home.html', show_logout=True, vaccination_centers=centers, hours=hours, rows=rows, name=name)
+                return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, rows=rows, name=name)
 
             # Close the connection and cursor
             cursor.close()
             conn.close()
 
-            return render_template('home.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name)
+            return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name)
         else:
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination_app.db')

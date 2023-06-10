@@ -4,18 +4,26 @@ import sqlite3
 conn = sqlite3.connect('vaccination_app.db')
 cursor = conn.cursor()
 
-# Alter User Table to add center_id and slot columns if they don't exist
-cursor.execute('''PRAGMA table_info(User)''')
-columns = cursor.fetchall()
-column_names = [column[1] for column in columns]
-if 'center_id' not in column_names:
-    cursor.execute('''ALTER TABLE User ADD COLUMN center_id INTEGER''')
-if 'slot' not in column_names:
-    cursor.execute('''ALTER TABLE User ADD COLUMN slot INTEGER''')
+# Create a new temporary table with the desired modifications
+cursor.execute('''CREATE TABLE IF NOT EXISTS User_temp (
+                    id INTEGER,
+                    name TEXT,
+                    email_id TEXT PRIMARY KEY,
+                    password TEXT,
+                    otp INTEGER,
+                    center_id INTEGER,
+                    slot INTEGER,
+                    FOREIGN KEY (center_id) REFERENCES VaccinationCenter(center_id)
+                )''')
 
-# Add foreign key constraint
-cursor.execute('''PRAGMA foreign_keys = ON''')
-cursor.execute('''ALTER TABLE User ADD FOREIGN KEY (center_id) REFERENCES VaccinationCenter(center_id)''')
+# Copy data from the original User table to the temporary table
+cursor.execute('''INSERT INTO User_temp SELECT * FROM User''')
+
+# Drop the original User table
+cursor.execute('''DROP TABLE User''')
+
+# Rename the temporary table to User
+cursor.execute('''ALTER TABLE User_temp RENAME TO User''')
 
 # Commit the changes and close the connection
 conn.commit()
