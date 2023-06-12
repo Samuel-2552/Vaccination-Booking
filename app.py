@@ -97,7 +97,7 @@ def user_login():
             # Invalid credentials, display an error message or redirect to the login page
             cursor.close()
             conn.close()
-            return "Invalid credentials"
+            return render_template('login.html', error="Invalid Credentials!")
     except:
         return "Ran into Some Issues go back and Try Again."
     
@@ -118,6 +118,20 @@ def home():
             conn = sqlite3.connect('vaccination_app.db')
             cursor = conn.cursor()
 
+            # Query the user table to fetch the user's slot details
+            cursor.execute("SELECT * FROM User WHERE email_id = ?", (user_id,))
+            user = cursor.fetchone()
+            center_id = user[5]
+            slot = user[6]
+            date = user[7]
+
+            # Query the vaccination center table to fetch the center details
+            cursor.execute("SELECT center_name, place, working_hour FROM VaccinationCenter WHERE center_id = ?", (center_id,))
+            center_details = cursor.fetchone()
+            center_name = center_details[0]
+            place = center_details[1]
+            working_hour = center_details[2]
+
             # Query the database to fetch the list of vaccination centers
             cursor.execute("SELECT DISTINCT center_name FROM VaccinationCenter")
             centers = cursor.fetchall()
@@ -129,6 +143,7 @@ def home():
             user = cursor.fetchone() 
             name=user[1]
             print("slot :", user)
+            print("Printing Necessary details :",center_name, place, working_hour, date)
 
             # Check if the search form is submitted
             if request.method == 'POST':
@@ -139,19 +154,12 @@ def home():
                 cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? OR working_hour = ?", (center, hour))
                 rows = cursor.fetchall()
                 
-
-                # Close the connection and cursor
-                cursor.close()
-                conn.close()
-
-                # Render the template with the search results
-                return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, rows=rows, name=name)
-
+            print("Printing Necessary details :",center_name, place, working_hour, date)
             # Close the connection and cursor
             cursor.close()
             conn.close()
 
-            return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name)
+            return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name, center_name=center_name, place=place, working_hour=working_hour, date=date)
         else:
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination_app.db')
@@ -476,8 +484,6 @@ def book_slot():
         center_id = request.json['center_id']
         conn = sqlite3.connect('vaccination_app.db')
         cursor = conn.cursor()
-        # Update the user's slot
-        cursor.execute("UPDATE User SET slot = 0 WHERE email_id = ?", (email_id,) )
 
         # Check if slots already booked
         cursor.execute("SELECT slot FROM user WHERE email_id = ?", (email_id,))

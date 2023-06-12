@@ -240,13 +240,14 @@
                             alert(xhr.responseText);
                             var slotsCell = document.getElementById('slots-' + centerId);
                             var slots = parseInt(slotsCell.innerText);
-                            if (slots > 0) {
-                                slotsCell.innerText = slots - 1;
-                                button.setAttribute('disabled', 'disabled');
-                                button.innerText = 'Booked';
-                                button.classList.remove('btn-primary');
-                                button.classList.add('btn-secondary');
-                            }
+                            location.reload();
+                            // if (slots > 0) {
+                            //     slotsCell.innerText = slots - 1;
+                            //     button.setAttribute('disabled', 'disabled');
+                            //     button.innerText = 'Booked';
+                            //     button.classList.remove('btn-primary');
+                            //     button.classList.add('btn-secondary');
+                            // }
                         }
                     };
                     xhr.send(JSON.stringify(data));
