@@ -172,32 +172,32 @@
                                     <!-- Add more columns as needed -->
                                 </tr>
                             </thead>
-                            <tbody class="table-primary ">
+                            <tbody class="table-primary">
                                 {% for row in rows %}
-                                    <tr>
-                                        <td>{{ row[3] }}</td>
-                                        <td>{{ row[2] }}</td>
-                                        <td>{{ row[5] }}</td>
-                                        <td>10</td>
-                                        <td>
-                                            {% if 'user_id' in session %}
-                                                {% if 10 %}
-                                                    <button type="button" class="btn btn-primary" onclick="alert('Your Slot is booked.')">Book</button>
-                                                {% else %}
-                                                    <button type="button" class="btn btn-secondary" disabled>Booked</button>
-                                                {% endif %}
+                                <tr>
+                                    <td>{{ row[3] }}</td>
+                                    <td>{{ row[2] }}</td>
+                                    <td>{{ row[5] }}</td>
+                                    <td id="slots-{{ row[0] }}">{{ row[6] }}</td>
+                                    <td>
+                                        {% if 'user_id' in session %}
+                                            {% if row[6] > 0 %}
+                                            <button type="button" class="btn btn-primary book-button" data-center-id="{{ row[0] }}">Book</button>
                                             {% else %}
-                                                <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot')">Book</button>
+                                            <button type="button" class="btn btn-secondary" disabled>Booked</button>
                                             {% endif %}
-                                        </td>
-                                        <!-- Add more cells for other columns -->
-                                    </tr>
+                                        {% else %}
+                                        <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot')">Book</button>
+                                        {% endif %}
+                                    </td>
+                                    <!-- Add more cells for other columns -->
+                                </tr>
                                 {% endfor %}
-                            </tbody>
+                            </tbody>                            
                         </table>
-                    {% endif %}
+                        {% endif %}
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
         
@@ -224,7 +224,37 @@
         
     </div>
     <br><br>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var bookButtons = document.querySelectorAll('.book-button');
+            bookButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var centerId = button.getAttribute('data-center-id');
+                    var data = {'center_id': centerId};
+        
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/book-slot', true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                            alert(xhr.responseText);
+                            var slotsCell = document.getElementById('slots-' + centerId);
+                            var slots = parseInt(slotsCell.innerText);
+                            if (slots > 0) {
+                                slotsCell.innerText = slots - 1;
+                                button.setAttribute('disabled', 'disabled');
+                                button.innerText = 'Booked';
+                                button.classList.remove('btn-primary');
+                                button.classList.add('btn-secondary');
+                            }
+                        }
+                    };
+                    xhr.send(JSON.stringify(data));
+                });
+            });
+        });
+        </script>
+    
     <script>
         const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');
         const body = document.querySelector('body');

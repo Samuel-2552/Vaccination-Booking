@@ -22,6 +22,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS User (
                     otp INTEGER,
                     center_id INTEGER,
                     slot INTEGER,
+                    date DATE, 
                     FOREIGN KEY (center_id) REFERENCES VaccinationCenter(center_id)
                 )''')
 

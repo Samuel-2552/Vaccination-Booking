@@ -1,10 +1,29 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 import bcrypt
+from datetime import date
+import schedule
+import time
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
 
+
+
+def update_slots():
+    conn = sqlite3.connect('vaccination_app.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE VaccinationCenter SET slots = 10")
+    conn.commit()
+    conn.close()
+
+update_slots()
+
+# Schedule the job to run every day at 12:00 am
+# schedule.every().day.at("00:00").do(update_slots)
+
+# schedule.run_pending()
+# time.sleep(1)
 
 
 # User signup logic
@@ -109,6 +128,7 @@ def home():
             cursor.execute("SELECT * FROM User WHERE email_id = ?",(user_id,))
             user = cursor.fetchone() 
             name=user[1]
+            print("slot :", user)
 
             # Check if the search form is submitted
             if request.method == 'POST':
@@ -299,7 +319,8 @@ def admin_dashboard():
                 conn.close()
                 
                 return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
-        
+        else:
+            return "Log in as Admin"
         if user:
             # Display user-specific information or perform other operations
             
@@ -447,6 +468,44 @@ def remove_center(center_id):
         return "Ran into Some Issues go back and Try Again."
 
     return redirect('/admin/dashboard')  # Redirect to the admin page after deleting
+
+@app.route('/book-slot', methods=['POST'])
+def book_slot():
+    if 'user_id' in session:            
+        email_id = session['user_id']
+        center_id = request.json['center_id']
+        conn = sqlite3.connect('vaccination_app.db')
+        cursor = conn.cursor()
+        # Update the user's slot
+        cursor.execute("UPDATE User SET slot = 0 WHERE email_id = ?", (email_id,) )
+
+        # Check if slots already booked
+        cursor.execute("SELECT slot FROM user WHERE email_id = ?", (email_id,))
+        slot= cursor.fetchone()[0]
+        if slot > 0:
+            conn.close()
+            return 'Slot already Booked! Maximium 1 booking!'
+        
+        # Check if slots are available
+        cursor.execute("SELECT slots FROM VaccinationCenter WHERE center_id = ?", (center_id,))
+        slots_available = cursor.fetchone()[0]
+        if slots_available <= 0:
+            conn.close()
+            return 'No slots available'
+        
+        # Update the user's slot
+        cursor.execute("UPDATE User SET slot = 1, date = ?, center_id = ? WHERE email_id = ?", (date.today(), center_id, email_id))
+        
+        # Update the vaccination center's slots
+        cursor.execute("UPDATE VaccinationCenter SET slots = slots - 1 WHERE center_id = ?", (center_id,))
+        
+        conn.commit()
+        conn.close()
+        print("Center Id received is: ", center_id)
+        return 'Slot booked successfully'
+    else:
+        return 'Try Again Later!'
+
 
 
 @app.route('/search')
