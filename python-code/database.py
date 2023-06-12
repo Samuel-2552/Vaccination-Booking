@@ -67,7 +67,6 @@ conn.commit()
 conn.close()
 
 
-
 # import sqlite3
 
 # # Connect to the database
