@@ -13,7 +13,7 @@ def g_mail(to_email,subject,body):
 
     # Sender's email and password
     gmail_user = "201501502@rajalakshmi.edu.in"
-    gmail_password = "Automate@Agra$2552"
+    gmail_password = "#"
 
 
     # Prepare the email
