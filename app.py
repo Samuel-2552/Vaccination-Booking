@@ -41,6 +41,31 @@ def g_mail(to_email,subject,body):
         print(e)
         print('Something went wrong...')
 
+def g__mail(to_email,subject,body):
+
+    # Sender's email and password
+    gmail_user = "201501502@rajalakshmi.edu.in"
+    gmail_password = "StupidFellow@Chennai$2552"
+
+
+    # Prepare the email
+    email_text = "From: %s\nTo: %s\nSubject: %s\n\n%s" % (gmail_user, to_email, subject, body)
+
+    try:
+        # Send the email
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        server.sendmail(gmail_user, to_email, email_text)
+        server.close()
+
+        print('Email sent!')
+        return 1
+    except Exception as e:
+        print(e)
+        print('Something went wrong...')
+        return 0
+
 # User signup logic
 @app.route('/admin/signup', methods=['GET', 'POST'])
 def admin_signup():
@@ -167,6 +192,173 @@ def user_login():
     # Render the user login form
     return render_template('login.html')
 
+@app.route('/send_otp')
+def send_otp():
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
+
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+
+            user_query = '''
+            SELECT * FROM user WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+            otp=OTP()
+            cursor.execute('''UPDATE user SET otp = ? WHERE id = ?''', (otp, user[0]))
+            conn.commit()
+            conn.close()
+
+            check=g__mail(user_id, f"Welcome to DevRev's Vaccination Booking {user[1]}!", f"Your OTP is {otp}. \n Verify it and Book your Slot Today!")
+            if check==1:
+                return render_template('verify_otp.html', success="OTP Sent! Check Mail!", name=user[1])
+            else:
+                return render_template('verify_otp.html', error="Email is invalid and does not exists!", name=user[1])
+        else:
+            return redirect('/')
+    except:
+        return render_template('verify_otp.html', error="Server Down try again Later!", name=user[1])
+
+            
+
+# User login logic
+@app.route('/verify_otp', methods=['GET', 'POST'])
+def verify_otp():
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
+
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+
+            user_query = '''
+            SELECT * FROM user WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+
+            status = user[6]
+
+            if status == 0:
+
+                if request.method == 'POST':
+                    # Get the user login form data
+                    otp = int(request.form['otp'])
+
+
+                    if otp == user[5]:
+                        cursor.execute('''UPDATE user SET status = ? WHERE id = ?''', (1, user[0]))
+                        conn.commit()
+                        conn.close()
+
+                        return redirect('/')
+                    else:
+                        return render_template('verify_otp.html', error="Invalid OTP!", name=user[1])
+                
+                return render_template('verify_otp.html', name=user[1])
+            else:
+                redirect('/')
+        else:
+            redirect('/')     
+    except:
+        render_template('verify_otp.html', error="Server Down Try Again Later.", name=user[1])
+
+@app.route('/admin/send_otp')
+def admin_send_otp():
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
+
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+
+            user_query = '''
+            SELECT * FROM admin WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+            otp=OTP()
+            cursor.execute('''UPDATE admin SET otp = ? WHERE id = ?''', (otp, user[0]))
+            conn.commit()
+            conn.close()
+
+            check=g__mail(user_id, f"Welcome to DevRev's Vaccination Booking {user[1]}!", f"Your OTP is {otp}. \n Verify it and Book your Slot Today!")
+            if check==1:
+                return render_template('admin_otp.html', success="OTP Sent! Check Mail!", name=user[1])
+            else:
+                return render_template('admin_otp.html', error="Email is invalid and does not exists!", name=user[1])
+        else:
+            return redirect('/')
+    except:
+        return render_template('admin_otp.html', error="Server Down try again Later!", name=user[1])
+
+            
+
+# User login logic
+@app.route('/admin/verify_otp', methods=['GET', 'POST'])
+def admin_verify_otp():
+    try:
+        # Check if the user is logged in
+        if 'user_id' in session:
+            # User is logged in, perform required logic
+
+            # Retrieve the user from the database using session['user_id']
+            user_id = session['user_id']
+
+            # Create a new connection and cursor
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+
+            user_query = '''
+            SELECT * FROM admin WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (user_id,))
+            user = cursor.fetchone()
+
+            status = user[6]
+
+            if status == 0:
+
+                if request.method == 'POST':
+                    # Get the user login form data
+                    otp = int(request.form['otp'])
+
+
+                    if otp == user[5]:
+                        cursor.execute('''UPDATE admin SET status = ? WHERE id = ?''', (1, user[0]))
+                        conn.commit()
+                        conn.close()
+
+                        return redirect('/')
+                    else:
+                        return render_template('admin_otp.html', error="Invalid OTP!", name=user[1])
+                
+                return render_template('admin_otp.html', name=user[1])
+            else:
+                redirect('/admin/login')
+        else:
+            redirect('/admin/login')     
+    except:
+        render_template('admin_otp.html', error="Server Down Try Again Later.", name=user[1])
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     try:
@@ -190,6 +382,10 @@ def home():
 
             cursor.execute("SELECT * FROM User WHERE email_id = ?",(user_id,))
             user = cursor.fetchone() 
+
+            status = user[6]
+            if status == 0:
+                return redirect('/verify_otp')
             name=user[1]
             print("slot :", user)
 
@@ -253,7 +449,6 @@ def home():
     except Exception as e:
         print(e)
         return "Ran into Some Issues. Please go back and try again."
-
 
 
 # Logout
@@ -382,25 +577,27 @@ def admin_dashboard():
                 conn.close()
                 
                 return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
+            else:
+                # Display user-specific information or perform other operations
+                status = user[6]
+                if status == 0:
+                    return redirect('/admin/verify_otp')
+                # Example: Get the user's name
+                name = user[1]  # Assuming the name is stored in the 2nd column
+                id = user[0]
+                center_query = '''
+                SELECT * FROM Vacc_Center WHERE admin_id = ?
+                '''
+                cursor.execute(center_query, (id,))
+                table_data = cursor.fetchall()
+                
+                # Close the connection and cursor
+                cursor.close()
+                conn.close()
+                
+                return render_template('vacc_center.html', name=name, table_data=table_data)
         else:
             return redirect('/admin/login')
-        if user:
-            # Display user-specific information or perform other operations
-            
-            # Example: Get the user's name
-            name = user[1]  # Assuming the name is stored in the 2nd column
-            id = user[0]
-            center_query = '''
-            SELECT * FROM Vacc_Center WHERE admin_id = ?
-            '''
-            cursor.execute(center_query, (id,))
-            table_data = cursor.fetchall()
-            
-            # Close the connection and cursor
-            cursor.close()
-            conn.close()
-            
-            return render_template('vacc_center.html', name=name, table_data=table_data)
         
     except:
         return "Ran into Some Issues go back and Try Again."
