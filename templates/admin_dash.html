@@ -133,10 +133,10 @@
                 <!-- Display table from database -->
                 <form action="/admin/add_admin" method="POST">
                     <div class="d-grid gap-2 d-md-flex justify-content-center">
-                        <input class="form-control me-2" name="id" type="text" required placeholder="id">
                         <input class="form-control me-2" name="name" type="text" required placeholder="name">
                         <input class="form-control me-2" name="email" type="email" required placeholder="email-id">
                         <input class="form-control me-2" name="password" type="password" required placeholder="password">
+                        <input class="form-control me-2" name="ph_no" type="number" required placeholder="phone number">
                     </div>
                     <br>
                     <button type="submit" class="btn btn-primary">Add Admin</button>
@@ -161,6 +161,7 @@
                             <th>Id</th>
                             <th>Name</th>
                             <th>Email-Id</th>
+                            <th>Phone No</th>
                             <th>Remove Admin</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
@@ -171,6 +172,7 @@
                             <td>{{ row[0] }}</td>
                             <td>{{ row[1] }}</td>
                             <td>{{ row[2] }}</td>
+                            <td>{{ row[4]}}</td>
                             <td>
                                 <a href="/admin/remove/{{ row[0] }}" class="delete-admin">
                                     <i class="fas fa-trash-alt"></i>
@@ -199,8 +201,9 @@
                     <div class="d-grid gap-2 d-md-flex justify-content-center">
                         <input class="form-control me-2" name="center_name" type="text" required placeholder="Center Name">
                         <input class="form-control me-2" name="place" type="text" required placeholder="Place">
-                        <input class="form-control me-2" name="working_hour" type="text" required placeholder="Working Hours (09:00 AM - 11:00 AM)">
+                        <input class="form-control me-2" name="working_hour" type="number" required placeholder="Working Hours eg: 8">
                         <input class="form-control me-2" name="dosage" type="number" required placeholder="Dosage Available">
+                        <input class="form-control me-2" name="slots" type="number" required placeholder="No of slots per day.">
                     </div>
                     <br>
                     <button type="submit" class="btn btn-primary">Add Center</button>
@@ -227,7 +230,8 @@
                             <th>Place</th>
                             <th>Working Hours</th>
                             <th>Dosage</th>
-                            <th>Email-Id</th>
+                            <th>Slots/day</th>
+                            <th>Admin Id</th>
                             <th>Remove Center</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
@@ -236,11 +240,12 @@
                         {% for row in table_data2 %}
                         <tr>
                             <td>{{ row[0] }}</td>
-                            <td>{{ row[3] }}</td>
-                            <td>{{ row[2] }}</td>
-                            <td>{{ row[5] }}</td>
-                            <td>{{ row[4] }}</td>
                             <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }} hours</td>
+                            <td>{{ row[4] }}</td>
+                            <td>{{ row[5] }}</td>
+                            <td>{{ row[8] }}</td>
                             <td>
                                 <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
                                     <i class="fas fa-trash-alt"></i>
@@ -254,7 +259,7 @@
             </div>
 
         </div>
-    </div>
+    </div><br><br><br>
   
     <script>
         const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');

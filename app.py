@@ -41,6 +41,47 @@ def g_mail(to_email,subject,body):
         print(e)
         print('Something went wrong...')
 
+# User signup logic
+@app.route('/admin/signup', methods=['GET', 'POST'])
+def admin_signup():
+    try:
+        if request.method == 'POST':
+            # Get the user signup form data
+            name = request.form['name']
+            email = request.form['email']
+            password = request.form['password']
+            ph_no = request.form['ph_no']
+
+            otp=OTP()
+            
+            # Hash the password
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            
+            # Perform user signup logic here
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+            
+            insert_user_query = '''
+            INSERT INTO Admin (name, email_id, password, ph_no, otp, date) VALUES (?, ?, ?, ?, ?, ?)
+            '''
+            cursor.execute(insert_user_query, (name, email, hashed_password, ph_no, otp, curr_date()))
+            conn.commit()
+            
+            # Close the connection
+            cursor.close()
+            conn.close()
+
+            
+            
+            g_mail(email,f"Welcome to DevRev's Vaccination Booking {name} Admin!", f"Create your Centers for booking vaccines slots! \nVerify your Email by entering this OTP once you LogIn. \n Your OTP is {otp}.")
+            # Redirect to the login page after successful signup
+            return redirect('/admin/login')
+    except:
+        return render_template('admin_signup.html',error="Email-Id already Exists!")
+    
+    # Render the user signup form
+    return render_template('admin_signup.html')
+
 
 # User signup logic
 @app.route('/signup', methods=['GET', 'POST'])
@@ -331,7 +372,7 @@ def admin_dashboard():
                 table_data = cursor.fetchall()
 
                 table_query2 = '''
-                SELECT * FROM VaccinationCenter
+                SELECT * FROM Vacc_Center
                 '''
                 cursor.execute(table_query2)
                 table_data2 = cursor.fetchall()
@@ -342,17 +383,17 @@ def admin_dashboard():
                 
                 return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
         else:
-            return "Log in as Admin"
+            return redirect('/admin/login')
         if user:
             # Display user-specific information or perform other operations
             
             # Example: Get the user's name
             name = user[1]  # Assuming the name is stored in the 2nd column
-
+            id = user[0]
             center_query = '''
-            SELECT * FROM VaccinationCenter WHERE admin_email_id = ?
+            SELECT * FROM Vacc_Center WHERE admin_id = ?
             '''
-            cursor.execute(center_query, (user_id,))
+            cursor.execute(center_query, (id,))
             table_data = cursor.fetchall()
             
             # Close the connection and cursor
@@ -375,31 +416,36 @@ def add_admin():
     try:
         if request.method == 'POST':
             # Get the user signup form data
-            id = request.form['id']
             name = request.form['name']
             email = request.form['email']
             password = request.form['password']
-            
+            ph_no = request.form['ph_no']
+            otp=OTP()
             # Hash the password
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             
+            
+
             # Perform user signup logic here
             conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             insert_user_query = '''
-            INSERT INTO Admin (id, name, email_id, password) VALUES (?, ?, ?, ?)
+            INSERT INTO Admin ( name, email_id, password, ph_no, otp, date) VALUES (?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(insert_user_query, (id, name, email, hashed_password))
+            cursor.execute(insert_user_query, (name, email, hashed_password, ph_no, otp, curr_date()))
             conn.commit()
             
             # Close the connection
             cursor.close()
             conn.close()
+
+            g_mail(email,f"Welcome to DevRev's Vaccination Booking {name} Admin!", f"Create your Centers for booking vaccines slots! \nVerify your Email by entering this OTP once you LogIn. \n Your OTP is {otp}.")
             
             # Redirect to the login page after successful signup
             return  redirect('/admin/dashboard')
-    except:
+    except Exception as e:
+        print(e)
         return "Ran into Some Issues go back and Try Again."
     
     # Render the user signup form
@@ -443,15 +489,24 @@ def add_centre():
             place = request.form['place']
             working_hour = request.form['working_hour']
             dosage = request.form['dosage']
+            slots = request.form['slots']
+
+            
             
             # Perform add center logic here
             conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
+
+            user_query = '''
+            SELECT * FROM Admin WHERE email_id = ?
+            '''
+            cursor.execute(user_query, (admin_email_id,))
+            user = cursor.fetchone()
             
             insert_user_query = '''
-            INSERT INTO VaccinationCenter (admin_email_id, place, center_name, dosage, working_hour) VALUES (?, ?, ?, ?, ?)
+            INSERT INTO Vacc_Center (name, place, working_hour, dosage, slots, date, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(insert_user_query, (admin_email_id, place, center_name, dosage, working_hour))
+            cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, curr_date(), user[0]))
             conn.commit()
             
             # Close the connection
@@ -461,7 +516,8 @@ def add_centre():
             # Redirect to the login page after successful signup
             return  redirect('/admin/dashboard')
         
-    except:
+    except Exception as e:
+        print(e)
         return "Ran into Some Issues go back and Try Again."
     
     # Render the user signup form
@@ -477,7 +533,7 @@ def remove_center(center_id):
             cursor = connection.cursor()
             
             try:
-                cursor.execute("DELETE FROM VaccinationCenter WHERE center_id = ?", (center_id,))
+                cursor.execute("DELETE FROM Vacc_center WHERE id = ?", (center_id,))
                 connection.commit()
                 flash('Vaccination center successfully removed')
             except sqlite3.Error as e:

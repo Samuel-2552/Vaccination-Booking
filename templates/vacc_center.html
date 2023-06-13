@@ -105,9 +105,9 @@
     <!-- Vaccination Center Details -->
     <br><br>
     <div class="container">
-        <div class="card  text-center bg-secondary">
-            <div class="card-header text-white bg-dark ">
-              <h2>Add Vaccination Center</h2>
+        <div class="card text-center bg-secondary">
+            <div class="card-header text-white bg-dark">
+                <h2>Add Vaccination Center's</h2>
             </div>
             <div class="card-body text-white bg-secondary mb-3">
                 <!-- Display table from database -->
@@ -115,16 +115,17 @@
                     <div class="d-grid gap-2 d-md-flex justify-content-center">
                         <input class="form-control me-2" name="center_name" type="text" required placeholder="Center Name">
                         <input class="form-control me-2" name="place" type="text" required placeholder="Place">
-                        <input class="form-control me-2" name="working_hour" type="text" required placeholder="Working Hours (09:00 AM - 11:00 AM)">
+                        <input class="form-control me-2" name="working_hour" type="number" required placeholder="Working Hours eg: 8">
                         <input class="form-control me-2" name="dosage" type="number" required placeholder="Dosage Available">
+                        <input class="form-control me-2" name="slots" type="number" required placeholder="No of slots per day.">
                     </div>
                     <br>
-                        <button type="submit" class="btn btn-primary">Add Center</button>
+                    <button type="submit" class="btn btn-primary">Add Center</button>
                 </form>
             </div>
 
             <div class="card-footer">
-                <h4>Your Vaccine Center's</h4>
+                <h4>Total Vaccine Center's</h4>
                 <br>
                 <!-- Search form -->
                 <form id="search-form2">
@@ -133,41 +134,47 @@
                         <button type="button" class="btn btn-primary search-button">Search</button>
                     </div>
                 </form>
+
                 <!-- Display Table -->
                 <table class="table table-striped">
-                  <thead class="table-dark">
-                    <tr>
-                      <th>Center Id</th>
-                      <th>Center Name</th>
-                      <th>Place</th>
-                      <th>Working Hours</th>
-                      <th>Dosage</th>
-                      <th>Remove Center</th>
-                      <!-- Add more column headings as per your database structure -->
-                    </tr>
-                  </thead>
-                  <tbody class="table-primary ">
-                    {% for row in table_data %}
-                      <tr>
-                        <td>{{ row[0] }}</td>
-                        <td>{{ row[3] }}</td>
-                        <td>{{ row[2] }}</td>
-                        <td>{{ row[5] }}</td>
-                        <td>{{ row[4] }}</td>
-                        <td>
-                            <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
-                              <i class="fas fa-trash-alt"></i>
-                            </a>
-                          </td>
-                        <!-- Add more columns as per your database structure -->
-                      </tr>
-                    {% endfor %}
-                  </tbody>
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Center Id</th>
+                            <th>Center Name</th>
+                            <th>Place</th>
+                            <th>Working Hours</th>
+                            <th>Dosage</th>
+                            <th>Slots/day</th>
+                            <th>Admin Id</th>
+                            <th>Remove Center</th>
+                            <!-- Add more column headings as per your database structure -->
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% for row in table_data %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }} hours</td>
+                            <td>{{ row[4] }}</td>
+                            <td>{{ row[5] }}</td>
+                            <td>{{ row[8] }}</td>
+                            <td>
+                                <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                            <!-- Add more columns as per your database structure -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </div>
 
         </div>
-    </div>
+    </div><br><br><br>
+  
 
     <script>
         const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');

@@ -140,14 +140,16 @@
                                     <div class="dropdown">
                                         <label for="center">Vaccination Center:</label>
                                         <select name="center" id="center" class="form-select">
+                                            <option value="no_filter" selected>No Filter</option>
                                             {% for center in vaccination_centers %}
                                             <option value="{{ center[0] }}">{{ center[0] }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                     <div class="dropdown">
-                                        <label for="hour">Working Hours:</label>
+                                        <label for="hour">Slot Timings:</label>
                                         <select name="hour" id="hour" class="form-select">
+                                            <option value="no_filter" selected>No Filter</option> <!-- Added default option -->
                                             {% for hour in hours %}
                                             <option value="{{ hour[0] }}">{{ hour[0] }}</option>
                                             {% endfor %}
