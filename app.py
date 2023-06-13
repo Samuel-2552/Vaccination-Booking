@@ -119,9 +119,9 @@ def user_login():
             # Invalid credentials, display an error message or redirect to the login page
             cursor.close()
             conn.close()
-            return "Invalid credentials"
+            return render_template('login.html', error="Invalid Credentials!")
     except:
-        return "Ran into Some Issues go back and Try Again."
+        render_template('login.html', error="Server Down Try Again Later.")
     
     # Render the user login form
     return render_template('login.html')
@@ -141,10 +141,10 @@ def home():
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
-            cursor.execute("SELECT DISTINCT center_name FROM VaccinationCenter")
+            cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
             centers = cursor.fetchall()
 
-            cursor.execute("SELECT DISTINCT working_hour FROM VaccinationCenter")
+            cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
             hours = cursor.fetchall()
 
             cursor.execute("SELECT * FROM User WHERE email_id = ?",(user_id,))
@@ -158,7 +158,7 @@ def home():
                 hour = request.form['hour']
 
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? OR working_hour = ?", (center, hour))
+                cursor.execute("SELECT * FROM Vacc_Center WHERE center_name = ? OR working_hour = ?", (center, hour))
                 rows = cursor.fetchall()
                 
 
@@ -180,10 +180,10 @@ def home():
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
-            cursor.execute("SELECT DISTINCT center_name FROM VaccinationCenter")
+            cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
             centers = cursor.fetchall()
 
-            cursor.execute("SELECT DISTINCT working_hour FROM VaccinationCenter")
+            cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
             hours = cursor.fetchall()
             # Check if the search form is submitted
             if request.method == 'POST':
