@@ -4,11 +4,33 @@ import bcrypt
 from datetime import date
 import schedule
 import time
+import smtplib
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
 
+def g_mail(to_email,subject,body):
 
+    # Sender's email and password
+    gmail_user = "201501502@rajalakshmi.edu.in"
+    gmail_password = "#"
+
+
+    # Prepare the email
+    email_text = "From: %s\nTo: %s\nSubject: %s\n\n%s" % (gmail_user, to_email, subject, body)
+
+    try:
+        # Send the email
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        server.sendmail(gmail_user, to_email, email_text)
+        server.close()
+
+        print('Email sent!')
+    except Exception as e:
+        print(e)
+        print('Something went wrong...')
 
 def update_slots():
     conn = sqlite3.connect('vaccination_app.db')
@@ -53,6 +75,7 @@ def user_signup():
             cursor.close()
             conn.close()
             
+            g_mail(email,f"Welcome {name}!", "Book your Slot Today")
             # Redirect to the login page after successful signup
             return redirect('/login')
     except:
