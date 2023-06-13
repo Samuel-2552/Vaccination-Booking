@@ -1,13 +1,22 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 import sqlite3
 import bcrypt
-from datetime import date
+from datetime import date, datetime
 import schedule
 import time
 import smtplib
+import random
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
+
+def curr_date():
+    current_date = datetime.now().date()
+    formatted_date = current_date.strftime("%Y-%m-%d")
+    return formatted_date
+
+def OTP():
+    return random.randint(100000, 999999)
 
 def g_mail(to_email,subject,body):
 
@@ -32,21 +41,6 @@ def g_mail(to_email,subject,body):
         print(e)
         print('Something went wrong...')
 
-def update_slots():
-    conn = sqlite3.connect('vaccination_app.db')
-    cursor = conn.cursor()
-    cursor.execute("UPDATE VaccinationCenter SET slots = 10")
-    conn.commit()
-    conn.close()
-
-update_slots()
-
-# Schedule the job to run every day at 12:00 am
-# schedule.every().day.at("00:00").do(update_slots)
-
-# schedule.run_pending()
-# time.sleep(1)
-
 
 # User signup logic
 @app.route('/signup', methods=['GET', 'POST'])
@@ -57,29 +51,34 @@ def user_signup():
             name = request.form['name']
             email = request.form['email']
             password = request.form['password']
+            ph_no = request.form['ph_no']
+
+            otp=OTP()
             
             # Hash the password
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             
             # Perform user signup logic here
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             insert_user_query = '''
-            INSERT INTO User (name, email_id, password) VALUES (?, ?, ?)
+            INSERT INTO User (name, email_id, password, ph_no, otp, date) VALUES (?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(insert_user_query, (name, email, hashed_password))
+            cursor.execute(insert_user_query, (name, email, hashed_password, ph_no, otp, curr_date()))
             conn.commit()
             
             # Close the connection
             cursor.close()
             conn.close()
+
             
-            g_mail(email,f"Welcome {name}!", "Book your Slot Today")
+            
+            g_mail(email,f"Welcome to DevRev's Vaccination Booking {name}!", f"Book your slot Today! \nVerify your Email by entering this OTP once you LogIn. \n Your OTP is {otp}.")
             # Redirect to the login page after successful signup
             return redirect('/login')
     except:
-        return "Ran into Some Issues go back and Try Again."
+        return render_template('signup.html',error="Email-Id already Exists!")
     
     # Render the user signup form
     return render_template('signup.html')
@@ -94,7 +93,7 @@ def user_login():
             password = request.form['password']
             
             # Retrieve the user from the database
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             user_query = '''
@@ -138,7 +137,7 @@ def home():
             user_id = session['user_id']
 
             # Create a new connection and cursor
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
@@ -177,7 +176,7 @@ def home():
             return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name)
         else:
             # Create a new connection and cursor
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
@@ -235,7 +234,7 @@ def admin_login():
             user_id = session['user_id']
             
             # Create a new connection and cursor
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             user_query = '''
@@ -265,7 +264,7 @@ def admin_login():
             password = request.form['password']
             
             # Retrieve the user from the database
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             user_query = '''
@@ -309,7 +308,7 @@ def admin_dashboard():
             user_id = session['user_id']
             
             # Create a new connection and cursor
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             user_query = '''
@@ -385,7 +384,7 @@ def add_admin():
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             
             # Perform user signup logic here
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -412,7 +411,7 @@ def remove_admin(id):
     try:
         if request.method == 'POST':
             # Delete the admin with the given ID from the database
-            connection = sqlite3.connect('vaccination_app.db')
+            connection = sqlite3.connect('vaccination.db')
             cursor = connection.cursor()
             
             try:
@@ -446,7 +445,7 @@ def add_centre():
             dosage = request.form['dosage']
             
             # Perform add center logic here
-            conn = sqlite3.connect('vaccination_app.db')
+            conn = sqlite3.connect('vaccination.db')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -474,7 +473,7 @@ def remove_center(center_id):
     try:
         if request.method == 'POST':
             # Delete the vaccination center with the given ID from the database
-            connection = sqlite3.connect('vaccination_app.db')
+            connection = sqlite3.connect('vaccination.db')
             cursor = connection.cursor()
             
             try:
@@ -497,7 +496,7 @@ def book_slot():
     if 'user_id' in session:            
         email_id = session['user_id']
         center_id = request.json['center_id']
-        conn = sqlite3.connect('vaccination_app.db')
+        conn = sqlite3.connect('vaccination.db')
         cursor = conn.cursor()
         # Update the user's slot
         cursor.execute("UPDATE User SET slot = 0 WHERE email_id = ?", (email_id,) )
