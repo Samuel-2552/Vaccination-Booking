@@ -36,12 +36,14 @@ cursor.execute('''
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Vacc_Center (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE,
+        name TEXT,
         place TEXT,
         working_hour INTEGER DEFAULT 10,
         dosage INTEGER DEFAULT 0,
         slots INTEGER DEFAULT 10,
         slot_time_status INTEGER DEFAULT 0,
+        slot_vaccine INTEGER DEFAULT 1,
+        vaccine_name TEXT,
         date DATE,
         admin_id INTEGER,
         FOREIGN KEY (admin_id) REFERENCES Admin(id)
@@ -51,15 +53,25 @@ cursor.execute('''
 # Create Slots table
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Slots (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         center_id INTEGER,
         user_id INTEGER,
         slot_timing TEXT,
         status INTEGER DEFAULT 0,
         date DATE,
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
-        FOREIGN KEY (user_id) REFERENCES User(id)
+        FOREIGN KEY (user_id) REFERENCES User(id),
+        FOREIGN KEY (slot_timing) REFERENCES slots_timing(slot_timing)
     )
 ''')
+
+#create slots_timing table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS slots_timing (
+        center_id INTEGER,
+        slot_timing TEXT
+    )
+ ''')
 
 # Create User History table
 cursor.execute('''

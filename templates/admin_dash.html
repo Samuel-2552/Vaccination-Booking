@@ -204,6 +204,8 @@
                         <input class="form-control me-2" name="working_hour" type="number" required placeholder="Working Hours eg: 8">
                         <input class="form-control me-2" name="dosage" type="number" required placeholder="Dosage Available">
                         <input class="form-control me-2" name="slots" type="number" required placeholder="No of slots per day.">
+                        <input class="form-control me-2" name="per_slot" type="number" required placeholder="No of vaccines per slots.">
+                        <input class="form-control me-2" name="vacc_name" type="text" required placeholder="Name of the Vaccine.">
                     </div>
                     <br>
                     <button type="submit" class="btn btn-primary">Add Center</button>
@@ -231,6 +233,8 @@
                             <th>Working Hours</th>
                             <th>Dosage</th>
                             <th>Slots/day</th>
+                            <th>Vaccines/slots</th>
+                            <th>Vaccine Name</th>
                             <th>Admin Id</th>
                             <th>Remove Center</th>
                             <!-- Add more column headings as per your database structure -->
@@ -245,7 +249,9 @@
                             <td>{{ row[3] }} hours</td>
                             <td>{{ row[4] }}</td>
                             <td>{{ row[5] }}</td>
+                            <td>{{ row[7] }}</td>
                             <td>{{ row[8] }}</td>
+                            <td>{{ row[10] }}</td>
                             <td>
                                 <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
                                     <i class="fas fa-trash-alt"></i>

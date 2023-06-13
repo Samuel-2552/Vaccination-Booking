@@ -678,7 +678,7 @@ def add_centre():
 
     try:
         if request.method == 'POST' and 'user_id' in session:
-
+            
             admin_email_id = session['user_id']
 
             # Get the user signup form data
@@ -687,8 +687,10 @@ def add_centre():
             working_hour = request.form['working_hour']
             dosage = request.form['dosage']
             slots = request.form['slots']
+            slot_vaccine=request.form['per_slot']
+            vacc_name=request.form['vacc_name']
 
-            
+            # print("inside code vlock")
             
             # Perform add center logic here
             conn = sqlite3.connect('vaccination.db')
@@ -701,9 +703,9 @@ def add_centre():
             user = cursor.fetchone()
             
             insert_user_query = '''
-            INSERT INTO Vacc_Center (name, place, working_hour, dosage, slots, date, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Vacc_Center (name, place, working_hour, dosage, slots, slot_vaccine, vaccine_name, date, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, curr_date(), user[0]))
+            cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, slot_vaccine, vacc_name, curr_date(), user[0]))
             conn.commit()
             
             # Close the connection
