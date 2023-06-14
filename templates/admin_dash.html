@@ -56,6 +56,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script>
         $(document).ready(function () {
+            $("#admin_details").hide();
+            $("#center_details").hide();
+            $("#user_details").hide();
+            $("#time_details").hide();
             $('a.delete-admin').click(function (event) {
                 event.preventDefault();  // Prevent the default link behavior
 
@@ -77,6 +81,30 @@
                         location.reload();  // Refresh the page after successful deletion
                     });
                 }
+            });
+            $("#admin").click(function(){
+                $("#admin_details").toggle(1000);
+                $("#center_details").hide(1000);
+                $("#user_details").hide(1000);
+                $("#time_details").hide(1000);
+            });
+            $("#center").click(function(){
+                $("#center_details").toggle(1000);
+                $("#admin_details").hide(1000);
+                $("#user_details").hide(1000);
+                $("#time_details").hide(1000);
+            });
+            $("#user").click(function(){
+                $("#user_details").toggle(1000);
+                $("#admin_details").hide(1000);
+                $("#center_details").hide(1000);
+                $("#time_details").hide(1000);
+            });
+            $("#time").click(function(){
+                $("#time_details").toggle(1000);
+                $("#admin_details").hide(1000);
+                $("#center_details").hide(1000);
+                $("#user_details").hide(1000);
             });
         });
     </script>
@@ -121,9 +149,31 @@
         <i class="fas fa-comment"></i>
     </div>
 
+    <br><br>
+    <center>
+        <div class="d-grid gap-2 d-md-flex justify-content-center">
+            <div>
+                <button id="admin" class="btn btn-dark" type="button">Show/Hide Admin Details</button>
+            </div>
+            <div>
+                <button id="center" class="btn btn-dark" type="button">Show/Hide Center Details</button>
+            </div>
+            <div>
+                <button id="user" class="btn btn-dark" type="button">Show/Hide User Details</button>
+            </div>
+            <div>
+                <button id="slots" class="btn btn-dark" type="button">Show/Hide All Slots Details</button>
+            </div>
+            <div>
+                <button id="time" class="btn btn-dark" type="button">Show/Hide Slots Timing Details</button>
+            </div>
+        </div>
+    </center>
+
+
     <!-- Add Center Admins -->
     <br><br>
-    <div class="container">
+    <div class="container" id="admin_details">
         <div class="card text-center bg-secondary">
             <div class="card-header text-white bg-dark">
                 <h2>Add Center's Admin</h2>
@@ -189,8 +239,8 @@
 
 
     <!-- Vaccination Center Details -->
-    <br><br>
-    <div class="container">
+    
+    <div class="container" id="center_details">
         <div class="card text-center bg-secondary">
             <div class="card-header text-white bg-dark">
                 <h2>Add Vaccination Center's</h2>
@@ -265,7 +315,140 @@
             </div>
 
         </div>
-    </div><br><br><br>
+    </div>
+    
+    <!-- Add and view Users -->
+    
+    <div class="container" id="user_details">
+        <div class="card text-center bg-secondary">
+            <div class="card-header text-white bg-dark">
+                <h2>Add or Remove a User</h2>
+            </div>
+            <div class="card-body text-white bg-secondary mb-3">
+
+                <!-- Display table from database -->
+                <form action="/admin/add_user" method="POST">
+                    <div class="d-grid gap-2 d-md-flex justify-content-center">
+                        <input class="form-control me-2" name="name" type="text" required placeholder="name">
+                        <input class="form-control me-2" name="email" type="email" required placeholder="email-id">
+                        <input class="form-control me-2" name="password" type="password" required placeholder="password">
+                        <input class="form-control me-2" name="ph_no" type="number" required placeholder="phone number">
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </form>
+            </div>
+
+            <div class="card-footer">
+                <h4>Results:</h4>
+                <br>
+                <!-- Search form -->
+                <form id="search-form-user">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control search-input" placeholder="Search by name or email-id.">
+                        <button type="button" class="btn btn-primary search-button">Search</button>
+                    </div>
+                </form>
+
+                <!-- Display Table -->
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Email-Id</th>
+                            <th>Phone No</th>
+                            <th>Remove Admin</th>
+                            <!-- Add more column headings as per your database structure -->
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% for row in table_data3 %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[4]}}</td>
+                            <td>
+                                <a href="/admin/remove/{{ row[0] }}" class="delete-admin">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                            <!-- Add more columns as per your database structure -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add and edit and view slot timing details -->
+    
+    <div class="container" id="time_details">
+        <div class="card text-center bg-secondary">
+            <div class="card-header text-white bg-dark">
+                <h2>Add or Edit Slot Timings</h2>
+            </div>
+            <div class="card-body text-white bg-secondary mb-3">
+
+                <!-- Display table from database -->
+                <form action="/admin/add_slots" method="POST">
+                    <div class="d-grid gap-2 d-md-flex justify-content-center">
+                        <input class="form-control me-2" name="name" type="text" required placeholder="name">
+                        <input class="form-control me-2" name="email" type="email" required placeholder="email-id">
+                        <input class="form-control me-2" name="password" type="password" required placeholder="password">
+                        <input class="form-control me-2" name="ph_no" type="number" required placeholder="phone number">
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </form>
+            </div>
+
+            <div class="card-footer">
+                <h4>Results:</h4>
+                <br>
+                <!-- Search form -->
+                <form id="search-form-user">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control search-input" placeholder="Search by name or email-id.">
+                        <button type="button" class="btn btn-primary search-button">Search</button>
+                    </div>
+                </form>
+
+                <!-- Display Table -->
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Slots</th>
+                            <th>Timings</th>
+                            <th>Edit Time</th>
+                            <!-- Add more column headings as per your database structure -->
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% for rows in table_data4 %}
+                            {% for slots,timings in rows %}
+                            <tr>
+                                <td>Slot {{ loop.index }}</td>
+                                <td>{{ timings }}</td>
+                                <td>
+                                    <a href="#" class="delete-admin">
+                                        <i class="fas fa-marker"></i>
+                                    </a>
+                                </td>
+                                <!-- Add more columns as per your database structure -->
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    
+    <br><br>
   
     <script>
         const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');

@@ -68,8 +68,12 @@ cursor.execute('''
 #create slots_timing table
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS slots_timing (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         center_id INTEGER,
-        slot_timing TEXT
+        center_name TEXT,
+        slot_timing TEXT,
+        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
+        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name),
     )
  ''')
 

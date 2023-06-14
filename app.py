@@ -269,11 +269,11 @@ def verify_otp():
                 
                 return render_template('verify_otp.html', name=user[1])
             else:
-                redirect('/')
+                return redirect('/')
         else:
-            redirect('/')     
+            return redirect('/')     
     except:
-        render_template('verify_otp.html', error="Server Down Try Again Later.", name=user[1])
+        return render_template('verify_otp.html', error="Server Down Try Again Later.", name=user[1])
 
 @app.route('/admin/send_otp')
 def admin_send_otp():
@@ -352,11 +352,11 @@ def admin_verify_otp():
                 
                 return render_template('admin_otp.html', name=user[1])
             else:
-                redirect('/admin/login')
+                return redirect('/admin/login')
         else:
-            redirect('/admin/login')     
+            return redirect('/admin/login')     
     except:
-        render_template('admin_otp.html', error="Server Down Try Again Later.", name=user[1])
+        return render_template('admin_otp.html', error="Server Down Try Again Later.", name=user[1])
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -559,7 +559,7 @@ def admin_dashboard():
                 # Example: Get the user's name
                 name = user[1]  # Assuming the name is stored in the 2nd column
 
-                # Retrieve the table data from the database
+                # Retrieve the admin data from the database
                 table_query = '''
                 SELECT * FROM Admin
                 '''
@@ -571,12 +571,39 @@ def admin_dashboard():
                 '''
                 cursor.execute(table_query2)
                 table_data2 = cursor.fetchall()
+
+                center_details = '''
+                SELECT * FROM Vacc_Center WHERE admin_id = ?
+                '''
+                cursor.execute(center_details, (int(user[0]),))
+                center_details = cursor.fetchall()
+                
+
+                # Retrieve the user data from the database
+                table_query = '''
+                SELECT * FROM User
+                '''
+                cursor.execute(table_query)
+                table_data3 = cursor.fetchall()
+
+                table_data4=[]
+                for i in range(len(center_details)):
+
+                    # Retrieve the slot timing data from the database
+                    table_query = '''
+                    SELECT * FROM slots_timing WHERE center_id = ?
+                    '''
+                    cursor.execute(table_query, (center_details[i][0],))
+                    table_data4.append(cursor.fetchall())
+
+                print(table_data4)
+
                 
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
                 
-                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2)
+                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2, table_data3=table_data3, table_data4=table_data4)
             else:
                 # Display user-specific information or perform other operations
                 status = user[6]
@@ -588,6 +615,26 @@ def admin_dashboard():
                 center_query = '''
                 SELECT * FROM Vacc_Center WHERE admin_id = ?
                 '''
+
+                center_details = '''
+                SELECT * FROM Vacc_Center WHERE admin_id = ?
+                '''
+                cursor.execute(center_details, (int(user[0]),))
+                center_details = cursor.fetchall()
+                print(center_details)
+
+                table_data4=[]
+                for i in range(len(center_details)):
+
+                    # Retrieve the slot timing data from the database
+                    table_query = '''
+                    SELECT * FROM slots_timing WHERE center_id = ?
+                    '''
+                    cursor.execute(table_query, (center_details[i][0],))
+                    table_data4.append(cursor.fetchall())
+
+                print(table_data4)
+
                 cursor.execute(center_query, (id,))
                 table_data = cursor.fetchall()
                 
@@ -595,17 +642,13 @@ def admin_dashboard():
                 cursor.close()
                 conn.close()
                 
-                return render_template('vacc_center.html', name=name, table_data=table_data)
+                return render_template('vacc_center.html', name=name, table_data=table_data, table_data4=table_data4)
         else:
             return redirect('/admin/login')
         
-    except:
-        return "Ran into Some Issues go back and Try Again."
-
-    
-    # User is not logged in, redirect to home page
-
-    return redirect('/admin/login')
+    except Exception as e:
+        print(e)
+        return "Ran into Some Issues, go back and Try Again."
 
 
 @app.route('/admin/add_admin', methods=['GET', 'POST'])
@@ -638,6 +681,46 @@ def add_admin():
             conn.close()
 
             g_mail(email,f"Welcome to DevRev's Vaccination Booking {name} Admin!", f"Create your Centers for booking vaccines slots! \nVerify your Email by entering this OTP once you LogIn. \n Your OTP is {otp}.")
+            
+            # Redirect to the login page after successful signup
+            return  redirect('/admin/dashboard')
+    except Exception as e:
+        print(e)
+        return "Ran into Some Issues go back and Try Again."
+    
+    # Render the user signup form
+    return redirect('/admin/dashboard')
+
+@app.route('/admin/add_user', methods=['GET', 'POST'])
+def add_user():
+    try:
+        if request.method == 'POST':
+            # Get the user signup form data
+            name = request.form['name']
+            email = request.form['email']
+            password = request.form['password']
+            ph_no = request.form['ph_no']
+            otp=OTP()
+            # Hash the password
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            
+            
+
+            # Perform user signup logic here
+            conn = sqlite3.connect('vaccination.db')
+            cursor = conn.cursor()
+            
+            insert_user_query = '''
+            INSERT INTO user ( name, email_id, password, ph_no, otp, date) VALUES (?, ?, ?, ?, ?, ?)
+            '''
+            cursor.execute(insert_user_query, (name, email, hashed_password, ph_no, otp, curr_date()))
+            conn.commit()
+            
+            # Close the connection
+            cursor.close()
+            conn.close()
+
+            g_mail(email,f"Welcome to DevRev's Vaccination Booking {name}!", f"Book your slot Today! \nVerify your Email by entering this OTP once you LogIn. \n Your OTP is {otp}.")
             
             # Redirect to the login page after successful signup
             return  redirect('/admin/dashboard')
@@ -707,6 +790,13 @@ def add_centre():
             '''
             cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, slot_vaccine, vacc_name, curr_date(), user[0]))
             conn.commit()
+
+            cursor.execute("SELECT * FROM Vacc_Center where name = ? AND admin_id = ?", (center_name, user[0]))
+            table_data2 = cursor.fetchall()
+
+            for i in range(int(slots)):
+                cursor.execute('''INSERT INTO slots_timing (center_id) VALUES (?)''', (table_data2[0][0],))
+                conn.commit()
             
             # Close the connection
             cursor.close()
