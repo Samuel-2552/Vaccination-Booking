@@ -82,6 +82,18 @@
                     });
                 }
             });
+            $('a.edit-time').click(function (event) {
+                event.preventDefault();  // Prevent the default link behavior
+
+                var adminId = $(this).attr('href').split('/').pop();
+                // console.log("slot timing edit." + adminId);
+                var confirmation = prompt('Enter the Slot timing.', '09:00 AM - 09:30 AM');
+                if (confirmation) {
+                    $.post('/admin/edit_time/' + adminId, { slot_timing: confirmation }, function (data) {
+                        location.reload();  // Refresh the page after successful update
+                    });
+                }
+            });
             $('a.delete-center').click(function (event) {
                 event.preventDefault();  // Prevent the default link behavior
 
@@ -125,7 +137,7 @@
     <!-- Nav Bar Content -->
     <nav class="navbar navbar-light">
         <a style="margin-left: 10px;" class="navbar-brand" href="#">
-            <img src="static/logo.svg" alt="logo" width="50" height="50" style="border-radius: 50%;">
+            <img src="/static/logo.svg" alt="logo" width="50" height="50" style="border-radius: 50%;">
         </a>
         <span class="mx-auto">
             <h2>DevRev's Vaccine Admin Dashboard</h2>
@@ -420,7 +432,7 @@
                 <h4>Results:</h4>
                 <br>
                 <!-- Search form -->
-                <form id="search-form-user">
+                <form id="search-form-time">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control search-input" placeholder="Search by name or email-id.">
                         <button type="button" class="btn btn-primary search-button">Search</button>
@@ -446,7 +458,7 @@
                                 <td>Slot {{ loop.index }}</td>
                                 <td>{{ timings }}</td>
                                 <td>
-                                    <a href="#" class="delete-admin">
+                                    <a href="/admin/edit_time/{{ id }}" class="edit-time">
                                         <i class="fas fa-marker"></i>
                                     </a>
                                 </td>

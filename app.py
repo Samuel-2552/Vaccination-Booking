@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify
 import sqlite3
 import bcrypt
 from datetime import date, datetime
@@ -866,6 +866,36 @@ def remove_center(center_id):
         return "Ran into Some Issues go back and Try Again."
 
     return redirect('/admin/dashboard')  # Redirect to the admin page after deleting
+
+@app.route('/admin/edit_time/<int:admin_id>', methods=['GET', 'POST'])
+def edit_time(admin_id):
+    try:
+        if request.method == 'POST':
+            # Delete the vaccination center with the given ID from the database
+            connection = sqlite3.connect('vaccination.db')
+            cursor = connection.cursor()
+            slot_timing = request.form.get('slot_timing')
+            if slot_timing:
+            
+                try:
+                    cursor.execute('UPDATE slots_timing SET slot_timing = ? WHERE id = ?', (slot_timing, admin_id))
+                    connection.commit()
+                    flash('Vaccination center successfully removed')
+                except sqlite3.Error as e:
+                    connection.rollback()
+                    flash('An error occurred while removing the vaccination center')
+                    print('SQLite error occurred:', e.args[0])
+
+                connection.close()
+                return jsonify(success=True)
+            else:
+                return jsonify(success=False, error='Invalid slot timing')
+
+    except:
+        return "Ran into Some Issues go back and Try Again."
+
+    return redirect('/admin/dashboard')  # Redirect to the admin page after deleting
+
 
 @app.route('/book-slot', methods=['POST'])
 def book_slot():
