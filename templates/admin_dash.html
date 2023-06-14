@@ -71,6 +71,17 @@
                     });
                 }
             });
+            $('a.delete-user').click(function (event) {
+                event.preventDefault();  // Prevent the default link behavior
+
+                var adminId = $(this).attr('href').split('/').pop();
+                var confirmation = confirm('Are you sure you want to remove User?');
+                if (confirmation) {
+                    $.post('/admin/remove_user/' + adminId, function (data) {
+                        location.reload();  // Refresh the page after successful deletion
+                    });
+                }
+            });
             $('a.delete-center').click(function (event) {
                 event.preventDefault();  // Prevent the default link behavior
 
@@ -358,7 +369,7 @@
                             <th>Name</th>
                             <th>Email-Id</th>
                             <th>Phone No</th>
-                            <th>Remove Admin</th>
+                            <th>Remove User</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
                     </thead>
@@ -370,7 +381,7 @@
                             <td>{{ row[2] }}</td>
                             <td>{{ row[4]}}</td>
                             <td>
-                                <a href="/admin/remove/{{ row[0] }}" class="delete-admin">
+                                <a href="/admin/remove_user/{{ row[0] }}" class="delete-user">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>
@@ -420,6 +431,7 @@
                 <table class="table table-striped">
                     <thead class="table-dark">
                         <tr>
+                            <th>Center Name</th>
                             <th>Slots</th>
                             <th>Timings</th>
                             <th>Edit Time</th>
@@ -428,8 +440,9 @@
                     </thead>
                     <tbody class="table-primary">
                         {% for rows in table_data4 %}
-                            {% for slots,timings in rows %}
+                            {% for id,slots,names,timings in rows %}
                             <tr>
+                                <td>{{names}}</td>
                                 <td>Slot {{ loop.index }}</td>
                                 <td>{{ timings }}</td>
                                 <td>

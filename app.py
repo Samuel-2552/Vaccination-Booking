@@ -45,7 +45,7 @@ def g__mail(to_email,subject,body):
 
     # Sender's email and password
     gmail_user = "201501502@rajalakshmi.edu.in"
-    gmail_password = "StupidFellow@Chennai$2552"
+    gmail_password = "#"
 
 
     # Prepare the email
@@ -346,7 +346,7 @@ def admin_verify_otp():
                         conn.commit()
                         conn.close()
 
-                        return redirect('/')
+                        return redirect('/admin/dashboard')
                     else:
                         return render_template('admin_otp.html', error="Invalid OTP!", name=user[1])
                 
@@ -526,7 +526,7 @@ def admin_login():
             # Invalid credentials, display an error message or redirect to the login page
             cursor.close()
             conn.close()
-            return "Invalid credentials"
+            return render_template("admin_login.html", error="Invalid Credntials!!")
     except:
         return "Ran into Some Issues go back and Try Again."
     
@@ -596,7 +596,14 @@ def admin_dashboard():
                     cursor.execute(table_query, (center_details[i][0],))
                     table_data4.append(cursor.fetchall())
 
-                print(table_data4)
+                # print(table_data4)
+
+                # check = '''
+                #     SELECT * FROM slots_timing
+                #     '''
+                # cursor.execute(check)
+
+                # print(cursor.fetchall())
 
                 
                 # Close the connection and cursor
@@ -615,13 +622,13 @@ def admin_dashboard():
                 center_query = '''
                 SELECT * FROM Vacc_Center WHERE admin_id = ?
                 '''
-
+                
                 center_details = '''
                 SELECT * FROM Vacc_Center WHERE admin_id = ?
                 '''
                 cursor.execute(center_details, (int(user[0]),))
                 center_details = cursor.fetchall()
-                print(center_details)
+                # print(center_details)
 
                 table_data4=[]
                 for i in range(len(center_details)):
@@ -633,7 +640,7 @@ def admin_dashboard():
                     cursor.execute(table_query, (center_details[i][0],))
                     table_data4.append(cursor.fetchall())
 
-                print(table_data4)
+                # print(table_data4)
 
                 cursor.execute(center_query, (id,))
                 table_data = cursor.fetchall()
@@ -641,13 +648,14 @@ def admin_dashboard():
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
+                print("working fine")
                 
                 return render_template('vacc_center.html', name=name, table_data=table_data, table_data4=table_data4)
         else:
             return redirect('/admin/login')
         
     except Exception as e:
-        print(e)
+        print("Isuue is raising here in admin dashboard", e)
         return "Ran into Some Issues, go back and Try Again."
 
 
@@ -755,6 +763,29 @@ def remove_admin(id):
 
     return redirect('/admin/dashboard')
 
+@app.route('/admin/remove_user/<int:id>', methods=['GET', 'POST'])
+def remove_user(id):
+    try:
+        if request.method == 'POST':
+            # Delete the admin with the given ID from the database
+            connection = sqlite3.connect('vaccination.db')
+            cursor = connection.cursor()
+            
+            try:
+                cursor.execute("DELETE FROM user WHERE id = ?", (id,))
+                connection.commit()
+                flash('Admin successfully removed')
+            except sqlite3.Error as e:
+                connection.rollback()
+                flash('An error occurred while removing the admin')
+                print('SQLite error occurred:', e.args[0])
+
+            connection.close()
+    except:
+        return "Ran into Some Issues go back and Try Again."
+
+    return redirect('/admin/dashboard')
+
 
 @app.route('/admin/add_center', methods=['GET', 'POST'])
 def add_centre():
@@ -773,7 +804,7 @@ def add_centre():
             slot_vaccine=request.form['per_slot']
             vacc_name=request.form['vacc_name']
 
-            # print("inside code vlock")
+            print("inside code vlock")
             
             # Perform add center logic here
             conn = sqlite3.connect('vaccination.db')
@@ -795,7 +826,7 @@ def add_centre():
             table_data2 = cursor.fetchall()
 
             for i in range(int(slots)):
-                cursor.execute('''INSERT INTO slots_timing (center_id) VALUES (?)''', (table_data2[0][0],))
+                cursor.execute('''INSERT INTO slots_timing (center_id, center_name) VALUES (?,?)''', (table_data2[0][0],center_name,))
                 conn.commit()
             
             # Close the connection

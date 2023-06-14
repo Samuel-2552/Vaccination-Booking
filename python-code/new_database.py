@@ -73,7 +73,7 @@ cursor.execute('''
         center_name TEXT,
         slot_timing TEXT,
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
-        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name),
+        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name)
     )
  ''')
 
