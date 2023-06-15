@@ -2,6 +2,7 @@ import sqlite3
 
 # Connect to the database
 conn = sqlite3.connect('vaccination.db')
+conn.execute('PRAGMA foreign_keys = ON;')  # Enable foreign key support
 cursor = conn.cursor()
 
 # Create Admin table
@@ -46,7 +47,9 @@ cursor.execute('''
         vaccine_name TEXT,
         date DATE,
         admin_id INTEGER,
-        FOREIGN KEY (admin_id) REFERENCES Admin(id)
+        admin_name TEXT,
+        FOREIGN KEY (admin_id) REFERENCES Admin(id) ON DELETE CASCADE,
+        FOREIGN KEY (admin_id) REFERENCES Admin(name) ON DELETE CASCADE
     )
 ''')
 
@@ -55,13 +58,17 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS Slots (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         center_id INTEGER,
+        center_name TEXT,
         user_id INTEGER,
+        user_name INTEGER,
         slot_timing TEXT,
         status INTEGER DEFAULT 0,
         date DATE,
-        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
-        FOREIGN KEY (user_id) REFERENCES User(id),
-        FOREIGN KEY (slot_timing) REFERENCES slots_timing(slot_timing)
+        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
+        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_name) REFERENCES User(name) ON DELETE CASCADE,
+        FOREIGN KEY (slot_timing) REFERENCES slots_timing(slot_timing) ON DELETE CASCADE
     )
 ''')
 
@@ -72,8 +79,8 @@ cursor.execute('''
         center_id INTEGER,
         center_name TEXT,
         slot_timing TEXT,
-        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
-        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name)
+        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
+        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name) ON DELETE CASCADE
     )
  ''')
 

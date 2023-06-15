@@ -1,14 +1,25 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify
 import sqlite3
 import bcrypt
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import schedule
 import time
 import smtplib
 import random
+import math
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
+
+def next_n_days(n):
+    current_date = datetime.now().date()
+    next_n_dates = []
+    for i in range(1, n+1):
+        delta = timedelta(days=i)
+        future_date = current_date + delta
+        formatted_date = future_date.strftime("%Y-%m-%d")
+        next_n_dates.append(formatted_date)
+    return next_n_dates
 
 def curr_date():
     current_date = datetime.now().date()
@@ -84,6 +95,7 @@ def admin_signup():
             
             # Perform user signup logic here
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -126,6 +138,7 @@ def user_signup():
             
             # Perform user signup logic here
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -160,6 +173,7 @@ def user_login():
             
             # Retrieve the user from the database
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             user_query = '''
@@ -204,6 +218,7 @@ def send_otp():
 
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             user_query = '''
@@ -241,6 +256,7 @@ def verify_otp():
 
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             user_query = '''
@@ -287,6 +303,7 @@ def admin_send_otp():
 
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             user_query = '''
@@ -324,6 +341,7 @@ def admin_verify_otp():
 
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             user_query = '''
@@ -371,6 +389,7 @@ def home():
 
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
@@ -414,6 +433,7 @@ def home():
         else:
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             # Query the database to fetch the list of vaccination centers
@@ -471,6 +491,7 @@ def admin_login():
             
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             user_query = '''
@@ -501,6 +522,7 @@ def admin_login():
             
             # Retrieve the user from the database
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             user_query = '''
@@ -545,6 +567,7 @@ def admin_dashboard():
             
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             user_query = '''
@@ -586,7 +609,12 @@ def admin_dashboard():
                 cursor.execute(table_query)
                 table_data3 = cursor.fetchall()
 
+                table_query5= '''SELECT * FROM Slots'''
+                cursor.execute(table_query5)
+                table_data5 = cursor.fetchall()
+
                 table_data4=[]
+
                 for i in range(len(center_details)):
 
                     # Retrieve the slot timing data from the database
@@ -595,6 +623,8 @@ def admin_dashboard():
                     '''
                     cursor.execute(table_query, (center_details[i][0],))
                     table_data4.append(cursor.fetchall())
+
+                # print(table_data5)
 
                 # print(table_data4)
 
@@ -610,7 +640,7 @@ def admin_dashboard():
                 cursor.close()
                 conn.close()
                 
-                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2, table_data3=table_data3, table_data4=table_data4)
+                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2, table_data3=table_data3, table_data4=table_data4, table_data5=table_data5)
             else:
                 # Display user-specific information or perform other operations
                 status = user[6]
@@ -676,6 +706,7 @@ def add_admin():
 
             # Perform user signup logic here
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -716,6 +747,7 @@ def add_user():
 
             # Perform user signup logic here
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
             
             insert_user_query = '''
@@ -808,6 +840,7 @@ def add_centre():
             
             # Perform add center logic here
             conn = sqlite3.connect('vaccination.db')
+            conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
             user_query = '''
@@ -822,11 +855,22 @@ def add_centre():
             cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, slot_vaccine, vacc_name, curr_date(), user[0]))
             conn.commit()
 
+
+
+            dates = next_n_days(math.ceil(int(dosage)/(int(slots)*int(slot_vaccine))))
+
             cursor.execute("SELECT * FROM Vacc_Center where name = ? AND admin_id = ?", (center_name, user[0]))
             table_data2 = cursor.fetchall()
 
             for i in range(int(slots)):
                 cursor.execute('''INSERT INTO slots_timing (center_id, center_name) VALUES (?,?)''', (table_data2[0][0],center_name,))
+                conn.commit()
+
+            for i in range(int(dosage)):
+                insert_user_query= '''
+                        INSERT INTO Slots (center_id, date) VALUES (?,?)
+                        '''
+                cursor.execute(insert_user_query, (table_data2[0][0],dates[i//(int(slots)*int(slot_vaccine))],))
                 conn.commit()
             
             # Close the connection
@@ -903,6 +947,7 @@ def book_slot():
         email_id = session['user_id']
         center_id = request.json['center_id']
         conn = sqlite3.connect('vaccination.db')
+        conn.execute('PRAGMA foreign_keys = ON;')
         cursor = conn.cursor()
         # Update the user's slot
         cursor.execute("UPDATE User SET slot = 0 WHERE email_id = ?", (email_id,) )

@@ -59,6 +59,7 @@
             $("#admin_details").hide();
             $("#center_details").hide();
             $("#user_details").hide();
+            $("#slots_details").hide();
             $("#time_details").hide();
             $('a.delete-admin').click(function (event) {
                 event.preventDefault();  // Prevent the default link behavior
@@ -109,18 +110,28 @@
                 $("#admin_details").toggle(1000);
                 $("#center_details").hide(1000);
                 $("#user_details").hide(1000);
+                $("#slots_details").hide(1000);
                 $("#time_details").hide(1000);
             });
             $("#center").click(function(){
                 $("#center_details").toggle(1000);
                 $("#admin_details").hide(1000);
                 $("#user_details").hide(1000);
+                $("#slots_details").hide(1000);
                 $("#time_details").hide(1000);
             });
             $("#user").click(function(){
                 $("#user_details").toggle(1000);
                 $("#admin_details").hide(1000);
                 $("#center_details").hide(1000);
+                $("#slots_details").hide(1000);
+                $("#time_details").hide(1000);
+            });
+            $("#slots").click(function(){
+                $("#slots_details").toggle(1000);
+                $("#admin_details").hide(1000);
+                $("#center_details").hide(1000);
+                $("#user_details").hide(1000);
                 $("#time_details").hide(1000);
             });
             $("#time").click(function(){
@@ -128,6 +139,7 @@
                 $("#admin_details").hide(1000);
                 $("#center_details").hide(1000);
                 $("#user_details").hide(1000);
+                $("#slots_details").hide(1000);
             });
         });
     </script>
@@ -406,6 +418,59 @@
         </div>
     </div>
 
+    <!-- Add and edit and view slot booking details -->
+    
+    <div class="container" id="slots_details">
+        <div class="card text-center bg-secondary">
+            <div class="card-header text-white bg-dark">
+                <h2>Edit or View Slot Bookings</h2>
+            </div>
+            <div class="card-footer">
+                <h4>Results:</h4>
+                <br>
+                <!-- Search form -->
+                <form id="search-form-slots">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control search-input" placeholder="Search by name or email-id.">
+                        <button type="button" class="btn btn-primary search-button">Search</button>
+                    </div>
+                </form>
+
+                <!-- Display Table -->
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Center Name</th>
+                            <th>User Name</th>
+                            <th>Slot Time</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Edit Time</th>
+                            <!-- Add more column headings as per your database structure -->
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% for id,center,user,timing,status,date in table_data5 %}
+                            <tr>
+                                <td>{{center}}</td>
+                                <td>{{ user }}</td>
+                                <td>{{ timing }}</td>
+                                <td>{{ status }}</td>
+                                <td>{{ date }}</td>
+                                <td>
+                                    <a href="/admin/edit_time/{{ id }}" class="edit-time">
+                                        <i class="fas fa-marker"></i>
+                                    </a>
+                                </td>
+                                <!-- Add more columns as per your database structure -->
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Add and edit and view slot timing details -->
     
     <div class="container" id="time_details">
@@ -413,21 +478,6 @@
             <div class="card-header text-white bg-dark">
                 <h2>Add or Edit Slot Timings</h2>
             </div>
-            <div class="card-body text-white bg-secondary mb-3">
-
-                <!-- Display table from database -->
-                <form action="/admin/add_slots" method="POST">
-                    <div class="d-grid gap-2 d-md-flex justify-content-center">
-                        <input class="form-control me-2" name="name" type="text" required placeholder="name">
-                        <input class="form-control me-2" name="email" type="email" required placeholder="email-id">
-                        <input class="form-control me-2" name="password" type="password" required placeholder="password">
-                        <input class="form-control me-2" name="ph_no" type="number" required placeholder="phone number">
-                    </div>
-                    <br>
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                </form>
-            </div>
-
             <div class="card-footer">
                 <h4>Results:</h4>
                 <br>
