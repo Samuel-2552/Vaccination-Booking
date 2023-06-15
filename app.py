@@ -89,6 +89,7 @@ def admin_signup():
             ph_no = request.form['ph_no']
 
             otp=OTP()
+            print(otp)
             
             # Hash the password
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -132,6 +133,7 @@ def user_signup():
             ph_no = request.form['ph_no']
 
             otp=OTP()
+            print(otp)
             
             # Hash the password
             hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -836,7 +838,7 @@ def add_centre():
             slot_vaccine=request.form['per_slot']
             vacc_name=request.form['vacc_name']
 
-            print("inside code vlock")
+            
             
             # Perform add center logic here
             conn = sqlite3.connect('vaccination.db')
@@ -849,12 +851,14 @@ def add_centre():
             cursor.execute(user_query, (admin_email_id,))
             user = cursor.fetchone()
             
+            
             insert_user_query = '''
-            INSERT INTO Vacc_Center (name, place, working_hour, dosage, slots, slot_vaccine, vaccine_name, date, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Vacc_Center (name, place, working_hour, dosage, slots, slot_vaccine, vaccine_name, date, admin_id, admin_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, slot_vaccine, vacc_name, curr_date(), user[0]))
+            cursor.execute(insert_user_query, (center_name, place, working_hour, dosage, slots, slot_vaccine, vacc_name, curr_date(), user[0], user[1]))
             conn.commit()
-
+            # print("not working")
+            
 
 
             dates = next_n_days(math.ceil(int(dosage)/(int(slots)*int(slot_vaccine))))
@@ -865,12 +869,16 @@ def add_centre():
             for i in range(int(slots)):
                 cursor.execute('''INSERT INTO slots_timing (center_id, center_name) VALUES (?,?)''', (table_data2[0][0],center_name,))
                 conn.commit()
+            
+            cursor.execute("Select * FROM slots_timing where center_id = ?", (table_data2[0][0],))
+            slot_timing_ids = cursor.fetchall()
+            print(slot_timing_ids)
 
             for i in range(int(dosage)):
                 insert_user_query= '''
-                        INSERT INTO Slots (center_id, date) VALUES (?,?)
+                        INSERT INTO Slots (center_id, center_name, slot_timing_id, date) VALUES (?,?,?, ?)
                         '''
-                cursor.execute(insert_user_query, (table_data2[0][0],dates[i//(int(slots)*int(slot_vaccine))],))
+                cursor.execute(insert_user_query, (table_data2[0][0],center_name,slot_timing_ids[(i//int(slot_vaccine))%int(slots)][0],dates[i//(int(slots)*int(slot_vaccine))],))
                 conn.commit()
             
             # Close the connection

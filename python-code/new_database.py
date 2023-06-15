@@ -37,7 +37,7 @@ cursor.execute('''
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS Vacc_Center (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
+        name TEXT UNIQUE,
         place TEXT,
         working_hour INTEGER DEFAULT 10,
         dosage INTEGER DEFAULT 0,
@@ -48,8 +48,7 @@ cursor.execute('''
         date DATE,
         admin_id INTEGER,
         admin_name TEXT,
-        FOREIGN KEY (admin_id) REFERENCES Admin(id) ON DELETE CASCADE,
-        FOREIGN KEY (admin_id) REFERENCES Admin(name) ON DELETE CASCADE
+        FOREIGN KEY (admin_id) REFERENCES Admin(id) ON DELETE CASCADE
     )
 ''')
 
@@ -61,14 +60,13 @@ cursor.execute('''
         center_name TEXT,
         user_id INTEGER,
         user_name INTEGER,
+        slot_timing_id INTEGER,
         slot_timing TEXT,
         status INTEGER DEFAULT 0,
         date DATE,
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
-        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_name) REFERENCES User(name) ON DELETE CASCADE,
-        FOREIGN KEY (slot_timing) REFERENCES slots_timing(slot_timing) ON DELETE CASCADE
+        FOREIGN KEY (slot_timing_id) REFERENCES slots_timing(id) ON DELETE CASCADE
     )
 ''')
 
@@ -79,8 +77,7 @@ cursor.execute('''
         center_id INTEGER,
         center_name TEXT,
         slot_timing TEXT,
-        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
-        FOREIGN KEY (center_name) REFERENCES Vacc_Center(name) ON DELETE CASCADE
+        FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE
     )
  ''')
 

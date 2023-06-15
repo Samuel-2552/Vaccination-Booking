@@ -320,7 +320,7 @@
                             <th>Slots/day</th>
                             <th>Vaccines/slots</th>
                             <th>Vaccine Name</th>
-                            <th>Admin Id</th>
+                            <th>Admin Name</th>
                             <th>Remove Center</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
@@ -336,7 +336,7 @@
                             <td>{{ row[5] }}</td>
                             <td>{{ row[7] }}</td>
                             <td>{{ row[8] }}</td>
-                            <td>{{ row[10] }}</td>
+                            <td>{{ row[11] }}</td>
                             <td>
                                 <a href="/admin/remove_center/{{ row[0] }}" class="delete-center">
                                     <i class="fas fa-trash-alt"></i>
@@ -440,28 +440,24 @@
                 <table class="table table-striped">
                     <thead class="table-dark">
                         <tr>
+                            <th>Booking Id</th>
                             <th>Center Name</th>
                             <th>User Name</th>
                             <th>Slot Time</th>
                             <th>Date</th>
                             <th>Status</th>
-                            <th>Edit Time</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
                     </thead>
                     <tbody class="table-primary">
-                        {% for id,center,user,timing,status,date in table_data5 %}
+                        {% for row in table_data5 %}
                             <tr>
-                                <td>{{center}}</td>
-                                <td>{{ user }}</td>
-                                <td>{{ timing }}</td>
-                                <td>{{ status }}</td>
-                                <td>{{ date }}</td>
-                                <td>
-                                    <a href="/admin/edit_time/{{ id }}" class="edit-time">
-                                        <i class="fas fa-marker"></i>
-                                    </a>
-                                </td>
+                                <td>{{row[0]}}</td>
+                                <td>{{row[2]}}</td>
+                                <td>{{ row[4] }}</td>
+                                <td>{{ row[5] }}</td>
+                                <td>{{ row[8] }}</td>
+                                <td>{{ row[7] }}</td>
                                 <!-- Add more columns as per your database structure -->
                             </tr>
                         {% endfor %}
@@ -502,13 +498,13 @@
                     </thead>
                     <tbody class="table-primary">
                         {% for rows in table_data4 %}
-                            {% for id,slots,names,timings in rows %}
+                            {% for row in rows %}
                             <tr>
-                                <td>{{names}}</td>
+                                <td>{{row[2]}}</td>
                                 <td>Slot {{ loop.index }}</td>
-                                <td>{{ timings }}</td>
+                                <td>{{ row[3] }}</td>
                                 <td>
-                                    <a href="/admin/edit_time/{{ id }}" class="edit-time">
+                                    <a href="/admin/edit_time/{{ row[0] }}" class="edit-time">
                                         <i class="fas fa-marker"></i>
                                     </a>
                                 </td>
