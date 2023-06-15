@@ -2,12 +2,11 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 import sqlite3
 import bcrypt
 from datetime import date, datetime, timedelta
-import schedule
+# import schedule
 import time
 import smtplib
 import random
 import math
-from decouple import config
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
@@ -628,23 +627,29 @@ def admin_dashboard():
                     cursor.execute(table_query, (center_details[i][0],))
                     table_data4.append(cursor.fetchall())
 
-                # print(table_data5)
+                # Query the database to fetch the list of vaccination centers
+                cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
+                centers = cursor.fetchall()
+                print(centers)
+                cursor.execute("SELECT DISTINCT place FROM Vacc_Center")
+                places = cursor.fetchall()
+                print(places)
+                cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
+                hours = cursor.fetchall()
+                print(hours)
+                cursor.execute("SELECT DISTINCT date FROM Slots")
+                dates = cursor.fetchall()
+                print(dates)
 
-                # print(table_data4)
-
-                # check = '''
-                #     SELECT * FROM slots_timing
-                #     '''
-                # cursor.execute(check)
-
-                # print(cursor.fetchall())
 
                 
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
                 
-                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2, table_data3=table_data3, table_data4=table_data4, table_data5=table_data5)
+                return render_template('admin_dash.html', name=name, table_data=table_data, table_data2=table_data2, 
+                                       table_data3=table_data3, table_data4=table_data4, table_data5=table_data5,
+                                       centers=centers, places=places, hours = hours, dates=dates)
             else:
                 # Display user-specific information or perform other operations
                 status = user[6]
