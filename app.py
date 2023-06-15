@@ -2,15 +2,15 @@ from flask import Flask, render_template, request, redirect, session, url_for, f
 import sqlite3
 import bcrypt
 from datetime import date, datetime, timedelta
-import schedule
+# import schedule
 import time
 import smtplib
 import random
 import math
-from decouple import config
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
+
 
 def next_n_days(n):
     current_date = datetime.now().date()
@@ -293,6 +293,20 @@ def verify_otp():
             return redirect('/')     
     except:
         return render_template('verify_otp.html', error="Server Down Try Again Later.", name=user[1])
+
+@app.route("/forget_password", methods=["POST","GET"])
+def forget_password():
+    try:
+        if request.method == "POST":
+            email = request.form["email"]
+            otp = OTP()
+            g_mail(email,f"Recover Your Account DevRev Vaccination Booking!", f"Change the Password! \nVerify your Email by entering this OTP to change Password. \n Your OTP is {otp}.")
+            return render_template("user_forget_password.html", status = 1, success="OTP sent. Check mail.")
+        return render_template("user_forget_password.html", status = 0)
+    except:
+        return render_template('user_forget_password.html', error = "Email id not found! Please your Email.")
+    
+
 
 @app.route('/admin/send_otp')
 def admin_send_otp():
