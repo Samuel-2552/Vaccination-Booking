@@ -7,6 +7,7 @@ import time
 import smtplib
 import random
 import math
+from decouple import config
 
 app = Flask(__name__)
 app.secret_key = 'ghf5yr7698iyf5463fhgfytytr9'  # Set a secret key for session encryption
@@ -415,11 +416,12 @@ def home():
                 center = request.form['center']
                 hour = request.form['hour']
 
-                # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM Vacc_Center WHERE center_name = ? OR working_hour = ?", (center, hour))
-                rows = cursor.fetchall()
-                
+                print("This is debugging",center,hour)
 
+                # Query the database to fetch the rows matching the selected criteria
+                cursor.execute("SELECT * FROM Slots WHERE center_name = ? OR slot_timing = ?", (center, hour))
+                rows = cursor.fetchall()
+                print(rows)
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
@@ -452,7 +454,7 @@ def home():
                 print("This is debugging",center,hour)
 
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM VaccinationCenter WHERE center_name = ? OR working_hour = ?", (center, hour))
+                cursor.execute("SELECT * FROM Slots WHERE center_name = ? OR slot_timing = ?", (center, hour))
                 rows = cursor.fetchall()
                 print(rows)
                 # Close the connection and cursor

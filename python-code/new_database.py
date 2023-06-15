@@ -64,6 +64,7 @@ cursor.execute('''
         slot_timing TEXT,
         status INTEGER DEFAULT 0,
         date DATE,
+        place TEXT,
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
         FOREIGN KEY (slot_timing_id) REFERENCES slots_timing(id) ON DELETE CASCADE
