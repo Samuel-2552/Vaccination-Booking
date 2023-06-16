@@ -409,12 +409,19 @@ def home():
             conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
-            # Query the database to fetch the list of vaccination centers
+           # Query the database to fetch the list of vaccination centers
             cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
             centers = cursor.fetchall()
-
+            # print(centers)
+            cursor.execute("SELECT DISTINCT place FROM Vacc_Center")
+            places = cursor.fetchall()
+            # print(places)
             cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
             hours = cursor.fetchall()
+            # print(hours)
+            cursor.execute("SELECT DISTINCT date FROM Slots")
+            dates = cursor.fetchall()
+            # print(dates)
 
             cursor.execute("SELECT * FROM User WHERE email_id = ?",(user_id,))
             user = cursor.fetchone() 
@@ -428,62 +435,135 @@ def home():
             # Check if the search form is submitted
             if request.method == 'POST':
                 center = request.form['center']
+                place = request.form['place']
                 hour = request.form['hour']
+                date = request.form['date']
 
-                print("This is debugging",center,hour)
 
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM Slots WHERE center_name = ? OR slot_timing = ?", (center, hour))
+                if center == "No Filter" and hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots")
+                elif center == "No Filter" and hour == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE date = ?", (date,))
+                elif center == "No Filter" and hour == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE place = ?", (place,))
+                elif center == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ?", (hour,))
+                elif hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ?", (center,))
+                elif center == "No Filter" and hour == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE place = ? AND date = ?", (place, date))
+                elif center == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND date = ?", (hour, date))
+                elif center == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ?", (hour, place))
+                elif hour == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND date = ?", (center, date))
+                elif hour == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ?", (center, place))
+                elif place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ?", (center, hour))
+                elif center == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ? AND date = ?", (hour, place, date))
+                elif hour == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ? AND date = ?", (center, place, date))
+                elif place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND date = ?", (center, hour, date))
+                elif date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ?", (center, hour, place))
+                else:
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ? AND date = ?", (center, hour, place, date))
+
                 rows = cursor.fetchall()
-                print(rows)
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
 
                 # Render the template with the search results
-                return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, rows=rows, name=name)
+                return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, rows=rows, name=name)
 
             # Close the connection and cursor
             cursor.close()
             conn.close()
 
-            return render_template('user_dash.html', show_logout=True, vaccination_centers=centers, hours=hours, name= name)
+            return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, name= name)
         else:
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
             conn.execute('PRAGMA foreign_keys = ON;')
             cursor = conn.cursor()
 
-            # Query the database to fetch the list of vaccination centers
+           # Query the database to fetch the list of vaccination centers
             cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
             centers = cursor.fetchall()
-
+            # print(centers)
+            cursor.execute("SELECT DISTINCT place FROM Vacc_Center")
+            places = cursor.fetchall()
+            # print(places)
             cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
             hours = cursor.fetchall()
+            # print(hours)
+            cursor.execute("SELECT DISTINCT date FROM Slots")
+            dates = cursor.fetchall()
+            # print(dates)
             # Check if the search form is submitted
             if request.method == 'POST':
                 center = request.form['center']
+                place = request.form['place']
                 hour = request.form['hour']
+                date = request.form['date']
 
-                print("This is debugging",center,hour)
+                print("This is debugging",center,place,hour,date)
 
                 # Query the database to fetch the rows matching the selected criteria
-                cursor.execute("SELECT * FROM Slots WHERE center_name = ? OR slot_timing = ?", (center, hour))
+                if center == "No Filter" and hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots")
+                elif center == "No Filter" and hour == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE date = ?", (date,))
+                elif center == "No Filter" and hour == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE place = ?", (place,))
+                elif center == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ?", (hour,))
+                elif hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ?", (center,))
+                elif center == "No Filter" and hour == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE place = ? AND date = ?", (place, date))
+                elif center == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND date = ?", (hour, date))
+                elif center == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ?", (hour, place))
+                elif hour == "No Filter" and place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND date = ?", (center, date))
+                elif hour == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ?", (center, place))
+                elif place == "No Filter" and date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ?", (center, hour))
+                elif center == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ? AND date = ?", (hour, place, date))
+                elif hour == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ? AND date = ?", (center, place, date))
+                elif place == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND date = ?", (center, hour, date))
+                elif date == "No Filter":
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ?", (center, hour, place))
+                else:
+                    cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ? AND date = ?", (center, hour, place, date))
+
                 rows = cursor.fetchall()
-                print(rows)
+
                 # Close the connection and cursor
                 cursor.close()
                 conn.close()
 
                 # Render the template with the search results
-                return render_template('home.html', show_logout=False, vaccination_centers=centers, hours=hours, rows=rows)
+                return render_template('home.html', show_logout=False, centers=centers, places=places, hours = hours, dates=dates, rows=rows)
 
             # Close the connection and cursor
             cursor.close()
             conn.close()
             
     # User is not logged in, redirect to the home page
-            return render_template('home.html', show_logout=False, vaccination_centers=centers, hours=hours)
+            return render_template('home.html', show_logout=False, centers=centers, places=places, hours = hours, dates=dates)
     except Exception as e:
         print(e)
         return "Ran into Some Issues. Please go back and try again."
@@ -573,7 +653,7 @@ def admin_login():
     # Render the user login form
     return render_template('admin_login.html')
 
-@app.route('/admin/dashboard')
+@app.route('/admin/dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     try:
         # Check if the user is logged in
@@ -645,16 +725,63 @@ def admin_dashboard():
                 # Query the database to fetch the list of vaccination centers
                 cursor.execute("SELECT DISTINCT name FROM Vacc_Center")
                 centers = cursor.fetchall()
-                print(centers)
+                # print(centers)
                 cursor.execute("SELECT DISTINCT place FROM Vacc_Center")
                 places = cursor.fetchall()
-                print(places)
+                # print(places)
                 cursor.execute("SELECT DISTINCT slot_timing FROM Slots")
                 hours = cursor.fetchall()
-                print(hours)
+                # print(hours)
                 cursor.execute("SELECT DISTINCT date FROM Slots")
                 dates = cursor.fetchall()
-                print(dates)
+                # print(dates)
+
+                # Check if the search form is submitted
+                if request.method == 'POST':
+                    center = request.form['center']
+                    place = request.form['place']
+                    hour = request.form['hour']
+                    date = request.form['date']
+
+                    print("This is debugging",center,place,hour,date)
+
+                    # Query the database to fetch the rows matching the selected criteria
+                    if center == "No Filter" and hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots")
+                    elif center == "No Filter" and hour == "No Filter" and place == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE date = ?", (date,))
+                    elif center == "No Filter" and hour == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE place = ?", (place,))
+                    elif center == "No Filter" and place == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE slot_timing = ?", (hour,))
+                    elif hour == "No Filter" and place == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ?", (center,))
+                    elif center == "No Filter" and hour == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE place = ? AND date = ?", (place, date))
+                    elif center == "No Filter" and place == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND date = ?", (hour, date))
+                    elif center == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ?", (hour, place))
+                    elif hour == "No Filter" and place == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND date = ?", (center, date))
+                    elif hour == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ?", (center, place))
+                    elif place == "No Filter" and date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ?", (center, hour))
+                    elif center == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE slot_timing = ? AND place = ? AND date = ?", (hour, place, date))
+                    elif hour == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND place = ? AND date = ?", (center, place, date))
+                    elif place == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND date = ?", (center, hour, date))
+                    elif date == "No Filter":
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ?", (center, hour, place))
+                    else:
+                        cursor.execute("SELECT * FROM Slots WHERE center_name = ? AND slot_timing = ? AND place = ? AND date = ?", (center, hour, place, date))
+
+                    table_data5 = cursor.fetchall()
+
+                
 
 
                 
@@ -898,9 +1025,9 @@ def add_centre():
 
             for i in range(int(dosage)):
                 insert_user_query= '''
-                        INSERT INTO Slots (center_id, center_name, slot_timing_id, date) VALUES (?,?,?, ?)
+                        INSERT INTO Slots (center_id, center_name, slot_timing_id, date, place) VALUES (?,?,?,?,?)
                         '''
-                cursor.execute(insert_user_query, (table_data2[0][0],center_name,slot_timing_ids[(i//int(slot_vaccine))%int(slots)][0],dates[i//(int(slots)*int(slot_vaccine))],))
+                cursor.execute(insert_user_query, (table_data2[0][0],center_name,slot_timing_ids[(i//int(slot_vaccine))%int(slots)][0],dates[i//(int(slots)*int(slot_vaccine))], place))
                 conn.commit()
             
             # Close the connection
