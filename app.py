@@ -230,6 +230,7 @@ def send_otp():
             cursor.execute(user_query, (user_id,))
             user = cursor.fetchone()
             otp=OTP()
+            print(otp)
             cursor.execute('''UPDATE user SET otp = ? WHERE id = ?''', (otp, user[0]))
             conn.commit()
             conn.close()
@@ -426,11 +427,17 @@ def home():
             cursor.execute("SELECT * FROM User WHERE email_id = ?",(user_id,))
             user = cursor.fetchone() 
 
+
+            cursor.execute("SELECT * FROM User_History WHERE user_id = ?",(user[0],))
+            user_history = cursor.fetchall()
+            print(user_history)
+
             status = user[6]
             if status == 0:
                 return redirect('/verify_otp')
             name=user[1]
             print("slot :", user)
+            wallet = user[7]
 
             # Check if the search form is submitted
             if request.method == 'POST':
@@ -480,13 +487,13 @@ def home():
                 conn.close()
 
                 # Render the template with the search results
-                return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, rows=rows, name=name)
+                return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, rows=rows, name=name, user_history=user_history, wallet=wallet)
 
             # Close the connection and cursor
             cursor.close()
             conn.close()
 
-            return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, name= name)
+            return render_template('user_dash.html', show_logout=True, centers=centers, places=places, hours = hours, dates=dates, name= name, wallet=wallet)
         else:
             # Create a new connection and cursor
             conn = sqlite3.connect('vaccination.db')
@@ -1080,6 +1087,7 @@ def edit_time(admin_id):
             
                 try:
                     cursor.execute('UPDATE slots_timing SET slot_timing = ? WHERE id = ?', (slot_timing, admin_id))
+                    cursor.execute('UPDATE slots SET slot_timing = ? where slot_timing_id = ? ', ( slot_timing, admin_id))
                     connection.commit()
                     flash('Vaccination center successfully removed')
                 except sqlite3.Error as e:
@@ -1102,39 +1110,57 @@ def edit_time(admin_id):
 def book_slot():
     if 'user_id' in session:            
         email_id = session['user_id']
-        center_id = request.json['center_id']
+        slot_id = request.json['center_id']
         conn = sqlite3.connect('vaccination.db')
         conn.execute('PRAGMA foreign_keys = ON;')
         cursor = conn.cursor()
-        # Update the user's slot
-        cursor.execute("UPDATE User SET slot = 0 WHERE email_id = ?", (email_id,) )
 
-        # Check if slots already booked
-        cursor.execute("SELECT slot FROM user WHERE email_id = ?", (email_id,))
-        slot= cursor.fetchone()[0]
-        if slot > 0:
+        user_query = '''
+            SELECT * FROM user WHERE email_id = ?
+            '''
+        cursor.execute(user_query, (email_id,))
+        user = cursor.fetchone()
+        
+        # Begin a transaction with immediate lock
+        cursor.execute("BEGIN IMMEDIATE")
+
+        try:
+            # Check if the row exists with status = 0
+            query = "SELECT * FROM Slots WHERE id = ? AND status = 0"
+            cursor.execute(query, (slot_id,))
+            row = cursor.fetchone()
+
+            if row is not None:
+                # Update the row with user ID, user name, and status = 1
+                query = "UPDATE Slots SET user_id = ?, user_name = ?, email = ?, status = 1 WHERE id = ?"
+                cursor.execute(query, (user[0], user[1], email_id, slot_id))
+                query = "UPDATE Vacc_Center SET dosage = dosage - 1 WHERE id = ?"
+                cursor.execute(query, (row[1],))
+                query = "UPDATE USER SET wallet = wallet - 25 where id = ?"
+                cursor.execute(query, (user[0],))
+                query = "INSERT INTO User_History (slot_id, user_id, user_name, center_id, center_name, center_place, slot_date, slot_timing, status) VALUES (?,?,?,?,?,?,?,?,?)"
+                cursor.execute(query, (slot_id,user[0],user[1],row[1],row[2],row[9],row[8],row[6],1,))
+
+                conn.commit()
+                return "Slot Successfully Booked!"
+
+            else:
+                # The row with status = 0 doesn't exist, slot not available
+                return "Slot is not available"
+
+        except Exception as e:
+            conn.rollback()
+            print(e)
+            return "An error occurred:"
+
+        finally:
+            # Release the lock and end the transaction
+            conn.commit()
+
+
             conn.close()
-            return 'Slot already Booked! Maximium 1 booking!'
-        
-        # Check if slots are available
-        cursor.execute("SELECT slots FROM VaccinationCenter WHERE center_id = ?", (center_id,))
-        slots_available = cursor.fetchone()[0]
-        if slots_available <= 0:
-            conn.close()
-            return 'No slots available'
-        
-        # Update the user's slot
-        cursor.execute("UPDATE User SET slot = 1, date = ?, center_id = ? WHERE email_id = ?", (date.today(), center_id, email_id))
-        
-        # Update the vaccination center's slots
-        cursor.execute("UPDATE VaccinationCenter SET slots = slots - 1 WHERE center_id = ?", (center_id,))
-        
-        conn.commit()
-        conn.close()
-        print("Center Id received is: ", center_id)
-        return 'Slot booked successfully'
     else:
-        return 'Try Again Later!'
+        return redirect('/login')
 
 
 

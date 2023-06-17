@@ -29,6 +29,7 @@ cursor.execute('''
         ph_no INTEGER,
         otp INTEGER DEFAULT 0,
         status INTEGER DEFAULT 0,
+        wallet INTEGER DEFAULT 50,
         date DATE
     )
 ''')
@@ -65,6 +66,7 @@ cursor.execute('''
         status INTEGER DEFAULT 0,
         date DATE,
         place TEXT,
+        email TEXT,
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
         FOREIGN KEY (slot_timing_id) REFERENCES slots_timing(id) ON DELETE CASCADE
@@ -85,16 +87,19 @@ cursor.execute('''
 # Create User History table
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS User_History (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slot_id INTEGER,
         user_id INTEGER,
+        user_name TEXT,
         center_id INTEGER,
+        center_name TEXT,
+        center_place TEXT,
         slot_date DATE,
         slot_timing TEXT,
         status INTEGER DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES User(id),
         FOREIGN KEY (center_id) REFERENCES Vacc_Center(id),
-        FOREIGN KEY (slot_date) REFERENCES Slots(date),
-        FOREIGN KEY (slot_timing) REFERENCES Slots(slot_timing),
-        FOREIGN KEY (status) REFERENCES Slots(status)
+        FOREIGN KEY (slot_id) REFERENCES Slots(id)
     )
 ''')
 

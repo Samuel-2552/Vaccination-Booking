@@ -188,7 +188,6 @@
                                     <th scope="col">Location</th>
                                     <th scope="col">Slot Timing</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Status</th>
                                     <th scope="col">Book Now</th>
                                     <!-- Add more columns as needed -->
                                 </tr>
@@ -196,23 +195,16 @@
                             <tbody class="table-primary ">
                                 {% for row in rows %}
                                     <tr>
+                                        {% if row[6] != None and row[7]==0 %}
                                         <td>{{ row[2] }}</td>
                                         <td>{{ row[9] }}</td>
                                         <td>{{ row[6] }}</td>
                                         <td>{{ row[8] }}</td>
-                                        <td>{{ row[7]}}</td>
                                         <td>
-                                            {% if 'user_id' in session %}
-                                                {% if 10 %}
-                                                    <button type="button" class="btn btn-primary" onclick="alert('Your Slot is booked.')">Book</button>
-                                                {% else %}
-                                                    <button type="button" class="btn btn-secondary" disabled>Booked</button>
-                                                {% endif %}
-                                            {% else %}
-                                                <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot');location.href='/login';">Book</button>
-                                            {% endif %}
+                                            <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot');location.href='/login';">Book</button>
                                         </td>
                                         <!-- Add more cells for other columns -->
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>

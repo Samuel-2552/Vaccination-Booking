@@ -45,7 +45,127 @@
             font-size: 24px;
             cursor: pointer;
         }
+
+        /*button css */
+.logout{
+    position:absolute;
+    display:flex;
+    justify-items: flex-end;
+    border:0.16em solid rgba(203, 244, 21, 0);
+    border-radius:4em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family: "Gill Sans", sans-serif; 
+    color:black;
+    text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
+    text-align:center;
+    transition: all 0.2s;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.7;
+}
+.dropbtn {
+  background-color: #FFEBA7;
+  width:50px;
+  height:50px;
+  font-weight: bolder;
+  border-radius: 50%;
+  color: black;
+  font-size: 26px;
+  border: none;
+  cursor: pointer;
+}
+.css1{
+  font-size:50px;
+  font-family: georgia;
+  font-style:italic;
+  font-weight:bold;
+  color:#FFEBA7;
+  text-shadow: 2px 2px 8px black;
+}
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #fff;
+}
+
+.dropdown {
+  align-items: left;
+  border-radius: 15px;
+  
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 125px;
+  right:10px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 22px 22px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}
     </style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#slots_details").hide();
+        $("#history_details").hide();
+        $("#slots").click(function(){
+                $("#slots_details").toggle(1000);
+                $("#history_details").hide();
+            });
+        $("#history").click(function(){
+            $("#history_details").toggle(1000);
+            $("#slots_details").hide();
+        });
+            // Add an event listener to the book button(s)
+        $('.book-button').click(function(event) {
+            if ("{{wallet}}">=25)
+            {
+            // Get the center ID from the data attribute
+            var centerId = $(this).data('center-id');
+
+            // Create the payload data as JSON
+            var data = JSON.stringify({ center_id: centerId });
+
+            // Send the data as JSON using an AJAX request
+            $.ajax({
+                url: '/book-slot',
+                type: 'POST',
+                data: data,
+                contentType: 'application/json',
+                success: function(response) {
+                // Handle the success response
+                alert(response);
+                
+                location.reload();
+                },
+                error: function(xhr, status, error) {
+                // Handle the error response
+                alert.error(error);
+                }
+            });
+        }
+        else {
+            alert("Wallet Balance is Low!!")
+        }
+            });
+        
+
+        });
+
+        
+    </script>
 </head>
 
 <body class="light">
@@ -71,7 +191,15 @@
     <!-- Log-In, Sign-Up, and Logout Buttons -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top:-65px; margin-right: 10px;">
         {% if show_logout %}
-        <a class="btn btn-primary me-md-2" href="/logout">Logout</a>
+        
+        <div class="dropdown" id="dropdown">
+          
+          <button onclick="myFunction()" class="dropbtn">{{name[0]}}</button>
+          <div  id="myDropdown" class="dropdown-content" >
+            <a  type="button" class="btn btn-primary" style="color: #000"><i style="float: left;" class="fas fa-wallet fa-lg"></i><span style="float: right;margin-top: -10px;">₹ {{wallet}}</span></a>
+            <a  href="/logout" type="button" class="btn btn-primary " style="color: #000;"><i style="float: left;" class="fas fa-sign-out-alt fa-lg"></i><span style="float: right;margin-top: -10px;">&nbsp;Logout</span></a>
+          </div>
+        </div>
         {% else %}
         <a class="btn btn-primary me-md-2" href="/login">Log-In</a>
         <a class="btn btn-primary" href="/signup">Sign-Up</a>
@@ -124,11 +252,22 @@
     <br><br>
     <center><h1>Welcome {{name}}! Book Your Slot!</h1></center>
 
-    <!-- Blog about Vaccine -->
+    <!-- View and Book Slots -->
     <br><br>
-    <div class="clearfix" style="margin-left:10px;">
-        <div >
-            <div class="container">
+
+    <center>
+        <div class="d-grid gap-2 d-md-flex justify-content-center">
+            <div>
+                <button id="slots" class="btn btn-dark" type="button">Book Your Slot</button>
+            </div>
+            <div>
+                <button id="history" class="btn btn-dark" type="button">Past, Current and Upcoming Bookings</button>
+            </div>
+        </div>
+    </center>
+    <br><br>
+    
+            <div class="container" id="slots_details">
                 <div class="card  text-center bg-secondary">
                     <div class="card-header text-white bg-dark ">
                       <h2>Book Your Slot Today!</h2>
@@ -136,25 +275,43 @@
                     <div class="card-body text-white bg-secondary mb-3">
                         <div class="d-grid gap-2 d-md-flex justify-content-center">
                             <form action="/" method="POST" class="d-grid gap-2 d-md-flex justify-content-center">
-                                <form action="/" method="POST" class="d-grid gap-2 d-md-flex justify-content-center">
-                                    <div class="dropdown">
-                                        <label for="center">Vaccination Center:</label>
-                                        <select name="center" id="center" class="form-select">
-                                            <option value="no_filter" selected>No Filter</option> <!-- Added default option -->
-                                            {% for center in vaccination_centers %}
-                                            <option value="{{ center[0] }}">{{ center[0] }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="dropdown">
-                                        <label for="hour">Working Hours:</label>                                        
-                                        <select name="hour" id="hour" class="form-select">
-                                            <option value="no_filter" selected>No Filter</option> <!-- Added default option -->
-                                            {% for hour in hours %}
-                                            <option value="{{ hour[0] }}">{{ hour[0] }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                            
+                                <div class="dropdown">
+                                    <label for="center">Center Name:</label>
+                                    <select name="center" id="center" class="form-select">
+                                        <option value="No Filter" selected>No Filter</option>
+                                        {% for center in centers %}
+                                        <option value="{{ center[0] }}">{{ center[0] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="dropdown">
+                                    <label for="place">Place</label>
+                                    <select name="place" id="place" class="form-select">
+                                        <option value="No Filter" selected>No Filter</option> <!-- Added default option -->
+                                        {% for place in places %}
+                                        <option value="{{ place[0] }}">{{ place[0] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="dropdown">
+                                    <label for="hour">Slot Time</label>
+                                    <select name="hour" id="hour" class="form-select">
+                                        <option value="No Filter" selected>No Filter</option> <!-- Added default option -->
+                                        {% for hour in hours %}
+                                        <option value="{{ hour[0] }}">{{ hour[0] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="dropdown">
+                                    <label for="date">Date</label>
+                                    <select name="date" id="date" class="form-select">
+                                        <option value="No Filter" selected>No Filter</option> <!-- Added default option -->
+                                        {% for date in dates %}
+                                        <option value="{{ date[0] }}">{{ date[0] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                                     <br>
                                     <button type="submit" class="btn btn-primary">Search Now</button>
                             </form>
@@ -170,7 +327,6 @@
                                     <th scope="col">Location</th>
                                     <th scope="col">Slot Timing</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Status</th>
                                     <th scope="col">Book Now</th>
                                     <!-- Add more columns as needed -->
                                 </tr>
@@ -178,24 +334,18 @@
                             <tbody class="table-primary">
                                 {% for row in rows %}
                                 <tr>
+                                    {% if row[6] != None and row[7]==0 %}
                                     <td>{{ row[2] }}</td>
                                     <td>{{ row[9] }}</td>
-                                    <td>{{ row[6] }}</td>
+                                    <td>{{ row[6]}}</td>
                                     <td>{{ row[8] }}</td>
-                                    <td id="slots-{{ row[0] }}">{{ row[7] }}</td>
                                     <td>
-                                        {% if 'user_id' in session %}
-                                            {% if row[7] == 0 %}
-                                            <button type="button" class="btn btn-primary book-button" data-center-id="{{ row[0] }}">Book</button>
-                                            {% else %}
-                                            <button type="button" class="btn btn-secondary" disabled>Booked</button>
-                                            {% endif %}
-                                        {% else %}
-                                        <button type="button" class="btn btn-primary" onclick="alert('Please log in to book your slot')">Book</button>
-                                        {% endif %}
+                                        <button type="button" class="btn btn-primary book-button" data-center-id="{{ row[0] }}">Book</button>
                                     </td>
                                     <!-- Add more cells for other columns -->
+                                    {% endif %}
                                 </tr>
+                                
                                 {% endfor %}
                             </tbody>                            
                         </table>
@@ -203,61 +353,53 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-    </div>
 
-
-    <br><br>
-    <div class="clearfix" style="margin-left:10px;">
-        <div >
-            <div class="container">
+            <div class="container" id="history_details">
                 <div class="card  text-center bg-secondary">
                     <div class="card-header text-white bg-dark ">
-                      <h2>Your Slot Booking Details!</h2>
+                      <h2>Your Past, Current and Upcomming Bookings!!</h2>
                     </div>
                     <div class="card-body text-white bg-secondary mb-3">
-                        <div class="d-grid gap-2 d-md-flex justify-content-center">
-                            <p>Your slot details: </p>
-                        </div>
+                        Results:
                           
+                    </div>
+                    <div class="card-footer">
+                        {% if user_history %}
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Booking Id</th>
+                                    <th scope="col">Center Name</th>
+                                    <th scope="col">Center Place</th>
+                                    <th scope="col">Slot Date</th>
+                                    <th scope="col">Slot Time</th>
+                                    <!-- Add more columns as needed -->
+                                </tr>
+                            </thead>
+                            <tbody class="table-primary">
+                                {% for row in user_history %}
+                                <tr>
+                                    {% if row[6] != None and row[7]==0 %}
+                                    <td>{{ row[0] }}</td>
+                                    <td>{{ row[5] }}</td>
+                                    <td>{{ row[7]}}</td>
+                                    <td>{{ row[8] }}</td>
+                                    <td>{{ row[9] }}</td>
+                                    <!-- Add more cells for other columns -->
+                                    {% endif %}
+                                </tr>
+                                
+                                {% endfor %}
+                            </tbody>                            
+                        </table>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-        
-    </div>
+
+
+    
     <br><br>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var bookButtons = document.querySelectorAll('.book-button');
-            bookButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var centerId = button.getAttribute('data-center-id');
-                    var data = {'center_id': centerId};
-        
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/book-slot', true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                            alert(xhr.responseText);
-                            var slotsCell = document.getElementById('slots-' + centerId);
-                            var slots = parseInt(slotsCell.innerText);
-                            if (slots > 0) {
-                                slotsCell.innerText = slots - 1;
-                                button.setAttribute('disabled', 'disabled');
-                                button.innerText = 'Booked';
-                                button.classList.remove('btn-primary');
-                                button.classList.add('btn-secondary');
-                            }
-                        }
-                    };
-                    xhr.send(JSON.stringify(data));
-                });
-            });
-        });
-        </script>
     
     <script>
         const toggleSwitch = document.querySelector('#flexSwitchCheckDefault');
@@ -325,6 +467,25 @@
         document.body.classList.toggle('dark', switchToggle.checked);
         localStorage.setItem('theme', switchToggle.checked ? 'dark' : 'light');
     });
+</script>
+<script>
+    function myFunction() {
+        document.getElementById("myDropdown").classList.toggle("show");
+      }
+      
+      // Close the dropdown if the user clicks outside of it
+      window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+          var dropdowns = document.getElementsByClassName("dropdown-content");
+          var i;
+          for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+            }
+          }
+        }
+      }
 </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"

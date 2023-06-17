@@ -393,6 +393,7 @@
                             <th>Name</th>
                             <th>Email-Id</th>
                             <th>Phone No</th>
+                            <th>Wallet Amount</th>
                             <th>Remove User</th>
                             <!-- Add more column headings as per your database structure -->
                         </tr>
@@ -404,6 +405,7 @@
                             <td>{{ row[1] }}</td>
                             <td>{{ row[2] }}</td>
                             <td>{{ row[4]}}</td>
+                            <td>{{ row[7]}}</td>
                             <td>
                                 <a href="/admin/remove_user/{{ row[0] }}" class="delete-user">
                                     <i class="fas fa-trash-alt"></i>
@@ -507,6 +509,10 @@
                                 <td>{{ row[8] }}</td>
                                 {% if row[7]==0 %}
                                     <td>Not Booked</td>
+                                {% elif row[7]==1 %}
+                                    <td>Booked</td>
+                                {% else %}
+                                    <td>Cancelled</td>
                                 {% endif %}
                                 <!-- Add more columns as per your database structure -->
                             </tr>
